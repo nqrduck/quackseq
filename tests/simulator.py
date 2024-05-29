@@ -1,52 +1,78 @@
-# Dummy test to communicate the structure
+import unittest
 import logging
 import matplotlib.pyplot as plt
-
 from quackseq.pulsesequence import QuackSequence
 from quackseq.event import Event
 from quackseq.functions import RectFunction
 from quackseq.spectrometer.simulator import Simulator
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
-seq = QuackSequence("test")
 
-tx = Event("tx", "10u", seq)
+class TestQuackSequence(unittest.TestCase):
 
-seq.add_event(tx)
+    def test_event_creation(self):
+        seq = QuackSequence("test - event creation")
+        seq.add_pulse_event("tx", "10u", 1, 0, RectFunction())
+        seq.add_blank_event("blank", "3u")
+        seq.add_readout_event("rx", "100u")
+        seq.add_blank_event("TR", "1m")
 
-seq.set_tx_amplitude(tx, 1)
-seq.set_tx_phase(tx, 0)
+        json = seq.to_json()
+        print(json)
 
-rect = RectFunction()
+        sim = Simulator()
+        sim.set_averages(100)
 
-seq.set_tx_shape(tx, rect)
+        result = sim.run_sequence(seq)
+        self.assertIsNotNone(result)
+        self.assertTrue(hasattr(result, "tdx"))
+        self.assertTrue(hasattr(result, "tdy"))
+        self.assertGreater(len(result.tdx), 0)
+        self.assertGreater(len(result.tdy), 0)
 
-blank = Event("blank", "3u", seq)
+        # Plotting the result can be useful for visual inspection during development
+        plt.plot(result.tdx, abs(result.tdy))
+        plt.show()
 
-seq.add_event(blank)
+    def test_simulation_run_sequence(self):
+        seq = QuackSequence("test - simulation run sequence")
 
-rx = Event("rx", "50u", seq)
-#rx.set_rx_phase(0)
+        tx = Event("tx", "10u", seq)
+        seq.add_event(tx)
+        seq.set_tx_amplitude(tx, 1)
+        seq.set_tx_phase(tx, 0)
 
-seq.set_rx(rx, True)
+        json = seq.to_json()
+        print(json)
 
-seq.add_event(rx)
+        rect = RectFunction()
+        seq.set_tx_shape(tx, rect)
 
-TR = Event("TR", "1m", seq)
+        blank = Event("blank", "3u", seq)
+        seq.add_event(blank)
 
-seq.add_event(TR)
+        rx = Event("rx", "100u", seq)
+        seq.set_rx(rx, True)
+        seq.add_event(rx)
 
-json = seq.to_json()
+        TR = Event("TR", "1m", seq)
+        seq.add_event(TR)
 
-print(json)
+        sim = Simulator()
+        sim.set_averages(100)
 
-sim = Simulator()
+        result = sim.run_sequence(seq)
+        self.assertIsNotNone(result)
+        self.assertTrue(hasattr(result, "tdx"))
+        self.assertTrue(hasattr(result, "tdy"))
+        self.assertGreater(len(result.tdx), 0)
+        self.assertGreater(len(result.tdy), 0)
 
-sim.set_averages(100)
+        # Plotting the result can be useful for visual inspection during development
+        plt.plot(result.tdx, abs(result.tdy))
+        plt.show()
 
-# Returns the data at the  RX event
-result = sim.run_sequence(seq)
 
-plt.plot(result.tdx, abs(result.tdy))
-plt.show()
+if __name__ == "__main__":
+    unittest.main()

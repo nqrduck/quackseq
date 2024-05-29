@@ -5,7 +5,8 @@ import importlib.metadata
 from collections import OrderedDict
 
 from quackseq.pulseparameters import PulseParameter, TXPulse, RXReadout
-from quackseq.functions import Function
+from quackseq.functions import Function, RectFunction
+from quackseq.event import Event
 
 logger = logging.getLogger(__name__)
 
@@ -60,19 +61,24 @@ class PulseSequence:
         Args:
             event (Event): The event to add
         """
+        if event.name in self.get_event_names():
+            raise ValueError(f"Event with name {event.name} already exists in the pulse sequence")
         self.events.append(event)
 
-    def create_event(self, event_name: str, duration: float) -> "Event":
+    def create_event(self, event_name: str, duration: str) -> "Event":
         """Create a new event and return it.
 
         Args:
-            event_name (str): The name of the event
+            event_name (str): The name of the event with a unit suffix (n, u, m)
             duration (float): The duration of the event
 
         Returns:
             Event: The created event
         """
-        event = self.Event(event_name, f"{float(duration):.16g}u")
+        event = Event(event_name, duration, self)
+        if event.name in self.get_event_names():
+            raise ValueError(f"Event with name {event.name} already exists in the pulse sequence")
+        
         self.events.append(event)
         return event
 
@@ -215,6 +221,26 @@ class QuackSequence(PulseSequence):
         self.add_pulse_parameter_option(self.TX_PULSE, TXPulse)
         self.add_pulse_parameter_option(self.RX_READOUT, RXReadout)
 
+    def add_blank_event(self, event_name: str, duration: float):
+        event = self.create_event(event_name, duration)
+
+    def add_pulse_event(
+        self,
+        event_name: str,
+        duration: float,
+        amplitude: float,
+        phase: float,
+        shape: Function = RectFunction(),
+    ):
+        event = self.create_event(event_name, duration)
+        self.set_tx_amplitude(event, amplitude)
+        self.set_tx_phase(event, phase)
+        self.set_tx_shape(event, shape)
+
+    def add_readout_event(self, event_name: str, duration: float):
+        event = self.create_event(event_name, duration)
+        self.set_rx(event, True)
+
     # TX Specific functions
 
     def set_tx_amplitude(self, event, amplitude: float) -> None:
@@ -259,6 +285,4 @@ class QuackSequence(PulseSequence):
             event (Event): The event to set the receiver for
             rx (bool): The receiver state
         """
-        event.parameters[self.RX_READOUT].get_option_by_name(
-            RXReadout.RX
-        ).value = rx
+        event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx

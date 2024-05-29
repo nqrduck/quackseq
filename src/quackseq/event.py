@@ -1,7 +1,6 @@
 import logging
 from collections import OrderedDict
 
-from quackseq.pulsesequence import PulseSequence
 from quackseq.pulseparameters import Option
 from quackseq.helpers import UnitConverter
 
@@ -13,7 +12,7 @@ class Event:
 
     Args:
         name (str): The name of the event
-        duration (str): The duration of the event
+        duration (float | str): The duration of the event, either as a float or a string with a unit suffix (n, u, m)
         pulse_sequence (PulseSequence): The pulse sequence the event belongs to
 
     Attributes:
@@ -22,7 +21,7 @@ class Event:
         pulse_sequence (PulseSequence): The pulse sequence the event belongs to
     """
 
-    def __init__(self, name: str, duration: str, pulse_sequence : PulseSequence) -> None:
+    def __init__(self, name: str, duration: float | str, pulse_sequence : "PulseSequence") -> None:
         """Initializes the event."""
         self.parameters = OrderedDict()
         self.name = name
@@ -45,15 +44,6 @@ class Event:
                 name,
                 id(self.parameters[name]),
             )
-
-    def on_duration_changed(self, duration: str) -> None:
-        """This method is called when the duration of the event is changed.
-
-        Args:
-            duration (str): The new duration of the event
-        """
-        logger.debug("Duration of event %s changed to %s", self.name, duration)
-        self.duration = duration
 
     @classmethod
     def load_event(cls, event, pulse_parameter_options):
@@ -95,12 +85,11 @@ class Event:
         return self._duration
 
     @duration.setter
-    def duration(self, duration: str):
+    def duration(self, duration: float | str):
         # Duration needs to be a positive number
-        try:
+        if isinstance(duration, str):
             duration = UnitConverter.to_float(duration)
-        except ValueError:
-            raise ValueError("Duration needs to be a number")
+
         if duration < 0:
             raise ValueError("Duration needs to be a positive number")
 
