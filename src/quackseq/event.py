@@ -46,7 +46,7 @@ class Event:
             )
 
     @classmethod
-    def load_event(cls, event, pulse_parameter_options):
+    def load_event(cls, event, pulse_sequence):
         """Loads an event from a dict.
 
         The pulse paramter options are needed to load the parameters
@@ -54,12 +54,14 @@ class Event:
 
         Args:
             event (dict): The dict with the event data
-            pulse_parameter_options (dict): The dict with the pulse parameter options
+            pulse_sequence (PulseSequence): The pulse sequence the event belongs to
 
         Returns:
             Event: The loaded event
         """
-        obj = cls(event["name"], event["duration"])
+        obj = cls(event["name"], event["duration"], pulse_sequence)
+
+        pulse_parameter_options = pulse_sequence.pulse_parameter_options
         for parameter in event["parameters"]:
             for pulse_parameter_option in pulse_parameter_options.keys():
                 # This checks if the pulse paramter options are the same as the ones in the pulse sequence

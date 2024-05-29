@@ -118,7 +118,7 @@ class PulseSequence:
         return data
 
     @classmethod
-    def load_sequence(cls, sequence, pulse_parameter_options):
+    def load_sequence(cls, sequence):
         """Loads a pulse sequence from a dict.
 
         The pulse paramter options are needed to load the parameters
@@ -141,7 +141,8 @@ class PulseSequence:
             raise KeyError("Pulse sequence version not found")
 
         for event_data in sequence["events"]:
-            obj.events.append(cls.Event.load_event(event_data, pulse_parameter_options))
+            event = Event.load_event(event_data, obj)
+            obj.events.append(event)
 
         return obj
 
