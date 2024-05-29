@@ -25,11 +25,11 @@ class QuackSettings(OrderedDict):
         return categories
         
     def get_settings_by_category(self, category):
-        settings = []
+        settings = dict()
 
-        for setting in self.values():
+        for key, setting in self.items():
             if setting.category == category:
-                settings.append(setting)
+                settings[key] = setting
 
         return settings
 

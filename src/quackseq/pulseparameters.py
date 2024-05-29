@@ -104,12 +104,12 @@ class TXPulse(PulseParameter):
         self.add_option(NumericOption(self.TX_PHASE, 0))
         self.add_option(
             NumericOption(
-                self.N_PHASE_CYCLES, 1, is_float=False, min_value=1, max_value=360
+                self.N_PHASE_CYCLES, 1, is_float=False, min_value=1, max_value=360, slider=False
             )
         )
         self.add_option(
             NumericOption(
-                self.PHASE_CYCLE_LEVEL, 0, is_float=False, min_value=0, max_value=10
+                self.PHASE_CYCLE_LEVEL, 0, is_float=False, min_value=0, max_value=10, slider=False
             )
         )
         self.add_option(

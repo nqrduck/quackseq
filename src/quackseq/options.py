@@ -107,6 +107,7 @@ class NumericOption(Option):
         self.is_float = is_float
         self.min_value = min_value
         self.max_value = max_value
+        self.slider = slider
 
     def set_value(self, value):
         """Sets the value of the option."""
@@ -134,6 +135,7 @@ class NumericOption(Option):
             "is_float": self.is_float,
             "min_value": self.min_value,
             "max_value": self.max_value,
+            "slider": self.slider,
         }
 
     @classmethod
@@ -182,7 +184,6 @@ class FunctionOption(Option):
             value: The value of the option.
         """
         self.value = value
-        self.value_changed.emit()
 
     def get_function_by_name(self, name):
         """Returns the function with the given name.

@@ -31,10 +31,10 @@ class Setting():
             description (str): A description of the setting.
             default: The default value of the setting.
         """
-        super().__init__()
         self.name = name
         self.category = category
         self.description = description
+        self.default =  default
         if default is not None:
             self.value = default
             # Update the description with the default value
@@ -57,6 +57,8 @@ class NumericalSetting(Setting):
             self.description_limit_info(description, min_value, max_value),
             default,
         )
+        self.min_value = min_value
+        self.max_value = max_value
 
     def description_limit_info(self, description: str, min_value, max_value) -> str:
         """Updates the description with the limits of the setting if there are any.
@@ -89,6 +91,7 @@ class FloatSetting(NumericalSetting):
         description (str) : A description of the setting
         min_value : The minimum value of the setting
         max_value : The maximum value of the setting
+        slider : If the setting should be displayed as a slider (only in the GUI not used in this GUI)
     """
 
     DEFAULT_LENGTH = 100
@@ -101,9 +104,12 @@ class FloatSetting(NumericalSetting):
         description: str,
         min_value: float = None,
         max_value: float = None,
+        slider = False
     ) -> None:
         """Create a new float setting."""
         super().__init__(name, category, description, default, min_value, max_value)
+        self.slider = slider
+
     @property
     def value(self):
         """The value of the setting. In this case, a float."""
@@ -135,9 +141,11 @@ class IntSetting(NumericalSetting):
         description: str,
         min_value=None,
         max_value=None,
+        slider = False
     ) -> None:
         """Create a new int setting."""
         super().__init__(name, category, description, default, min_value, max_value)
+        self.slider = slider
 
 
     @property

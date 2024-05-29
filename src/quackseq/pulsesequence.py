@@ -63,6 +63,7 @@ class PulseSequence:
         """
         if event.name in self.get_event_names():
             raise ValueError(f"Event with name {event.name} already exists in the pulse sequence")
+        
         self.events.append(event)
 
     def create_event(self, event_name: str, duration: str) -> "Event":
@@ -211,8 +212,8 @@ class QuackSequence(PulseSequence):
     If you want to implement your own spectrometer specific pulse sequence, you can inherit from the PulseSequence class.
     """
 
-    TX_PULSE = "TXPulse"
-    RX_READOUT = "RXParameters"
+    TX_PULSE = "TX"
+    RX_READOUT = "RX"
 
     def __init__(self, name: str, version: str = None) -> None:
         """Initializes the pulse sequence."""
