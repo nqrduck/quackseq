@@ -109,7 +109,6 @@ class FloatSetting(NumericalSetting):
     def value(self, value):
         logger.debug(f"Setting {self.name} to {value}")
         self._value = float(value)
-        self.settings_changed.emit()
 
 
 class IntSetting(NumericalSetting):
@@ -130,10 +129,8 @@ class IntSetting(NumericalSetting):
         description: str,
         min_value=None,
         max_value=None,
-        spin_box: tuple = (False, False),
     ) -> None:
         """Create a new int setting."""
-        self.spin_box = spin_box
         super().__init__(name, description, default, min_value, max_value)
 
     @property

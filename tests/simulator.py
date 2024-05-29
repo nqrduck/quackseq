@@ -1,8 +1,13 @@
 # Dummy test to communicate the structure
+import logging
+import matplotlib.pyplot as plt
+
 from quackseq.pulsesequence import QuackSequence
 from quackseq.event import Event
 from quackseq.functions import RectFunction
+from quackseq.spectrometer.simulator import Simulator
 
+logging.basicConfig(level=logging.DEBUG)
 
 seq = QuackSequence("test")
 
@@ -17,11 +22,11 @@ rect = RectFunction()
 
 seq.set_tx_shape(tx, rect)
 
-blank = Event("blank", "10u", seq)
+blank = Event("blank", "3u", seq)
 
 seq.add_event(blank)
 
-rx = Event("rx", "10u", seq)
+rx = Event("rx", "50u", seq)
 #rx.set_rx_phase(0)
 
 seq.set_rx(rx, True)
@@ -36,11 +41,12 @@ json = seq.to_json()
 
 print(json)
 
-#sim = Simulator()
+sim = Simulator()
 
-#sim.set_averages(100)
+sim.set_averages(100)
 
 # Returns the data at the  RX event
-#result = sim.run(seq)
+result = sim.run_sequence(seq)
 
-#result.plot()
+plt.plot(result.tdx, abs(result.tdy))
+plt.show()

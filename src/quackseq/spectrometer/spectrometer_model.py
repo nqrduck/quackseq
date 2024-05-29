@@ -2,7 +2,7 @@
 
 import logging
 from collections import OrderedDict
-from quackseq.spectrometer.spectrometer_setting import Setting
+from quackseq.spectrometer.spectrometer_settings import Setting
 
 logger = logging.getLogger(__name__)
 
@@ -12,22 +12,14 @@ class SpectrometerModel():
 
     It contains the settings and pulse parameters of the spectrometer.
 
-    Args:
-        module (Module) : The module that the spectrometer is connected to
-
     Attributes:
         settings (OrderedDict) : The settings of the spectrometer
     """
 
     settings: OrderedDict
 
-    def __init__(self, module):
-        """Initializes the spectrometer model.
-
-        Args:
-            module (Module) : The module that the spectrometer is connected to
-        """
-        super().__init__(module)
+    def __init__(self):
+        """Initializes the spectrometer model."""
         self.settings = OrderedDict()
 
     def add_setting(self, setting: Setting, category: str) -> None:
