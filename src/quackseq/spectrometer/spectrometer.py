@@ -1,3 +1,6 @@
+from typing import Any
+
+
 class Spectrometer():
     """Base class for spectrometers.
 
@@ -20,20 +23,3 @@ class Spectrometer():
         """Sets the number of averages."""
         raise NotImplementedError
     
-    @property
-    def controller(self):
-        """The controller of the spectrometer."""
-        return self._controller
-    
-    @controller.setter
-    def controller(self, controller):
-        self._controller = controller
-
-    @property
-    def model(self):
-        """The model of the spectrometer."""
-        return self._model
-    
-    @model.setter
-    def model(self, model):
-        self._model = model
