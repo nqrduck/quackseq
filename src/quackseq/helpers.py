@@ -32,6 +32,8 @@ class UnitConverter:
                 return decimal.Decimal(value)
         except TypeError:
             return decimal.Decimal(value)
+        except decimal.InvalidOperation:
+            raise ValueError(f"Invalid value: {value}, suffixes are n, u, m")
 
     @classmethod
     def to_float(cls, value: str) -> float:

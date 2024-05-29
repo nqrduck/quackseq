@@ -1,32 +1,40 @@
 # Dummy test to communicate the structure
-from quackseq.pulsesequence import PulseSequence
+from quackseq.pulsesequence import QuackSequence
 from quackseq.event import Event
 from quackseq.functions import RectFunction
 
 
-seq = PulseSequence("test")
+seq = QuackSequence("test")
 
-tx = Event("tx", "10u")
+tx = Event("tx", "10u", seq)
 
-# tx.set_tx_amplitude(1)
-#tx.set_tx_phase(0)
-#tx.set_shape(RectFunction())
+seq.add_event(tx)
 
-#seq.add_event(tx)
+seq.set_tx_amplitude(tx, 1)
+seq.set_tx_phase(tx, 0)
 
-#blank = Event("blank", "10u")
+rect = RectFunction()
 
-#seq.add_event(blank)
+seq.set_tx_shape(tx, rect)
 
-#rx = Event("rx", "10u")
+blank = Event("blank", "10u", seq)
+
+seq.add_event(blank)
+
+rx = Event("rx", "10u", seq)
 #rx.set_rx_phase(0)
-#rx.set_rx(True)
 
-#seq.add_event(rx)
+seq.set_rx(rx, True)
 
-#TR = Event("TR", "1ms")
+seq.add_event(rx)
 
-#seq.add_event(TR)
+TR = Event("TR", "1m", seq)
+
+seq.add_event(TR)
+
+json = seq.to_json()
+
+print(json)
 
 #sim = Simulator()
 

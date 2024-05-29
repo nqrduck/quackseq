@@ -1,6 +1,7 @@
 import logging
 from collections import OrderedDict
 
+from quackseq.pulsesequence import PulseSequence
 from quackseq.pulseparameters import Option
 from quackseq.helpers import UnitConverter
 
@@ -13,26 +14,37 @@ class Event:
     Args:
         name (str): The name of the event
         duration (str): The duration of the event
+        pulse_sequence (PulseSequence): The pulse sequence the event belongs to
 
     Attributes:
         name (str): The name of the event
         duration (str): The duration of the event
-        parameters (OrderedDict): The parameters of the event
+        pulse_sequence (PulseSequence): The pulse sequence the event belongs to
     """
 
-    def __init__(self, name: str, duration: str) -> None:
+    def __init__(self, name: str, duration: str, pulse_sequence : PulseSequence) -> None:
         """Initializes the event."""
         self.parameters = OrderedDict()
         self.name = name
         self.duration = duration
+        self.pulse_sequence = pulse_sequence
+        self.parameters = OrderedDict()
+        self.init_pulse_parameters()
 
-    def add_parameter(self, parameter) -> None:
-        """Adds a parameter to the event.
-
-        Args:
-            parameter: The parameter to add
-        """
-        self.parameters.append(parameter)
+    def init_pulse_parameters(self) -> None:
+        """Initializes the pulse parameters of the event."""
+        # Create a default instance of the pulse parameter options and add it to the event
+        pulse_parameters = self.pulse_sequence.pulse_parameter_options
+        for name, pulse_parameter_class in pulse_parameters.items():
+            logger.debug("Adding pulse parameter %s to event %s", name, self.name)
+            self.parameters[name] = pulse_parameter_class(
+                name
+            )
+            logger.debug(
+                "Created pulse parameter %s with object id %s",
+                name,
+                id(self.parameters[name]),
+            )
 
     def on_duration_changed(self, duration: str) -> None:
         """This method is called when the duration of the event is changed.

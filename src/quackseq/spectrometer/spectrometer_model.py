@@ -17,11 +17,9 @@ class SpectrometerModel():
 
     Attributes:
         settings (OrderedDict) : The settings of the spectrometer
-        pulse_parameter_options (OrderedDict) : The pulse parameter options of the spectrometer
     """
 
     settings: OrderedDict
-    pulse_parameter_options: OrderedDict
 
     def __init__(self, module):
         """Initializes the spectrometer model.
@@ -31,7 +29,6 @@ class SpectrometerModel():
         """
         super().__init__(module)
         self.settings = OrderedDict()
-        self.pulse_parameter_options = OrderedDict()
 
     def add_setting(self, setting: Setting, category: str) -> None:
         """Adds a setting to the spectrometer.
@@ -61,17 +58,6 @@ class SpectrometerModel():
                 if setting.name == name:
                     return setting
         raise ValueError(f"Setting with name {name} not found")
-
-    def add_pulse_parameter_option(
-        self, name: str, pulse_parameter_class: "PulseParameter"
-    ) -> None:
-        """Adds a pulse parameter option to the spectrometer.
-
-        Args:
-            name (str) : The name of the pulse parameter
-            pulse_parameter_class (PulseParameter) : The pulse parameter class
-        """
-        self.pulse_parameter_options[name] = pulse_parameter_class
 
     @property
     def target_frequency(self):

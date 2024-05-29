@@ -2,6 +2,10 @@
 
 import logging
 import importlib.metadata
+from collections import OrderedDict
+
+from quackseq.pulseparameters import PulseParameter, TXPulse, RXReadout
+from quackseq.functions import Function
 
 logger = logging.getLogger(__name__)
 
@@ -11,21 +15,36 @@ class PulseSequence:
 
     Args:
         name (str): The name of the pulse sequence
+        version (str): The version of the pulse sequence
 
     Attributes:
         name (str): The name of the pulse sequence
         events (list): The events of the pulse sequence
+        pulse_parameter_options (dict): The pulse parameter options
     """
 
-    def __init__(self, name, version = None) -> None:
+    def __init__(self, name: str, version: str = None) -> None:
         """Initializes the pulse sequence."""
         self.name = name
-        # Saving version to check for compatability of saved sequence
+        # Saving version to check for compatibility of saved sequence
         if version is not None:
             self.version = version
         else:
-            self.version = importlib.metadata.version("nqrduck_spectrometer")
+            self.version = importlib.metadata.version("quackseq")
+
         self.events = list()
+        self.pulse_parameter_options = OrderedDict()
+
+    def add_pulse_parameter_option(
+        self, name: str, pulse_parameter_class: "PulseParameter"
+    ) -> None:
+        """Adds a pulse parameter option to the spectrometer.
+
+        Args:
+            name (str) : The name of the pulse parameter
+            pulse_parameter_class (PulseParameter) : The pulse parameter class
+        """
+        self.pulse_parameter_options[name] = pulse_parameter_class
 
     def get_event_names(self) -> list:
         """Returns a list of the names of the events in the pulse sequence.
@@ -34,16 +53,28 @@ class PulseSequence:
             list: The names of the events
         """
         return [event.name for event in self.events]
-    
-    def add_event(self, event_name: str, duration: float) -> None:
+
+    def add_event(self, event: "Event") -> None:
         """Add a new event to the pulse sequence.
+
+        Args:
+            event (Event): The event to add
+        """
+        self.events.append(event)
+
+    def create_event(self, event_name: str, duration: float) -> "Event":
+        """Create a new event and return it.
 
         Args:
             event_name (str): The name of the event
             duration (float): The duration of the event
+
+        Returns:
+            Event: The created event
         """
-        self.events.append(self.Event(event_name, f"{float(duration):.16g}u"))
-        
+        event = self.Event(event_name, f"{float(duration):.16g}u")
+        self.events.append(event)
+        return event
 
     def delete_event(self, event_name: str) -> None:
         """Deletes an event from the pulse sequence.
@@ -56,6 +87,8 @@ class PulseSequence:
                 self.events.remove(event)
                 break
 
+    # Loading and saving of pulse sequences
+
     def to_json(self):
         """Returns a dict with all the data in the pulse sequence.
 
@@ -63,7 +96,7 @@ class PulseSequence:
             dict: The dict with the sequence data
         """
         # Get the versions of this package
-        data = {"name": self.name, "version" : self.version, "events": []}
+        data = {"name": self.name, "version": self.version, "events": []}
         for event in self.events:
             event_data = {
                 "name": event.name,
@@ -95,16 +128,17 @@ class PulseSequence:
             KeyError: If the pulse parameter options are not the same as the ones in the pulse sequence
         """
         try:
-            obj = cls(sequence["name"], version = sequence["version"])
+            obj = cls(sequence["name"], version=sequence["version"])
         except KeyError:
             logger.error("Pulse sequence version not found")
             raise KeyError("Pulse sequence version not found")
-            
+
         for event_data in sequence["events"]:
             obj.events.append(cls.Event.load_event(event_data, pulse_parameter_options))
 
         return obj
 
+    # Automation of pulse sequences
     class Variable:
         """A variable is a parameter that can be used within a pulsesequence as a placeholder.
 
@@ -163,3 +197,68 @@ class PulseSequence:
             if not isinstance(variables, list):
                 raise TypeError("Variables needs to be a list")
             self._variables = variables
+
+
+class QuackSequence(PulseSequence):
+    """This is the Pulse Sequence that is compatible with all types of spectrometers.
+
+    If you want to implement your own spectrometer specific pulse sequence, you can inherit from the PulseSequence class.
+    """
+
+    TX_PULSE = "TXPulse"
+    RX_READOUT = "RXParameters"
+
+    def __init__(self, name: str, version: str = None) -> None:
+        """Initializes the pulse sequence."""
+        super().__init__(name, version)
+
+        self.add_pulse_parameter_option(self.TX_PULSE, TXPulse)
+        self.add_pulse_parameter_option(self.RX_READOUT, RXReadout)
+
+    # TX Specific functions
+
+    def set_tx_amplitude(self, event, amplitude: float) -> None:
+        """Sets the amplitude of the transmitter.
+
+        Args:
+            event (Event): The event to set the amplitude for
+            amplitude (float): The amplitude of the transmitter
+        """
+        event.parameters[self.TX_PULSE].get_option_by_name(
+            TXPulse.RELATIVE_AMPLITUDE
+        ).value = amplitude
+
+    def set_tx_phase(self, event, phase: float) -> None:
+        """Sets the phase of the transmitter.
+
+        Args:
+            event (Event): The event to set the phase for
+            phase (float): The phase of the transmitter
+        """
+        event.parameters[self.TX_PULSE].get_option_by_name(
+            TXPulse.TX_PHASE
+        ).value = phase
+
+    def set_tx_shape(self, event, shape: Function) -> None:
+        """Sets the shape of the transmitter.
+
+        Args:
+            event (Event): The event to set the shape for
+            shape (Any): The shape of the transmitter
+        """
+        event.parameters[self.TX_PULSE].get_option_by_name(
+            TXPulse.TX_PULSE_SHAPE
+        ).value = shape
+
+    # RX Specific functions
+
+    def set_rx(self, event, rx: bool) -> None:
+        """Sets the receiver on or off.
+
+        Args:
+            event (Event): The event to set the receiver for
+            rx (bool): The receiver state
+        """
+        event.parameters[self.RX_READOUT].get_option_by_name(
+            RXReadout.RX
+        ).value = rx
