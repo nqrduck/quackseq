@@ -11,7 +11,8 @@ class Setting():
     E.g. the Transmit gain or the number of points in a spectrum.
 
     Args:
-        name (str) : The name of the setting
+        name (str) : The name of the setting as it is used in the code
+        category (str) : The category of the setting
         description (str) : A description of the setting
         default : The default value of the setting
 
@@ -19,9 +20,10 @@ class Setting():
         name (str) : The name of the setting
         description (str) : A description of the setting
         value : The value of the setting
+        category (str) : The category of the setting
     """
 
-    def __init__(self, name: str, description: str = None, default=None) -> None:
+    def __init__(self, name: str, category : str, description: str = None, default=None) -> None:
         """Create a new setting.
 
         Args:
@@ -29,9 +31,9 @@ class Setting():
             description (str): A description of the setting.
             default: The default value of the setting.
         """
-        self.widget = None
         super().__init__()
         self.name = name
+        self.category = category
         self.description = description
         if default is not None:
             self.value = default
@@ -46,11 +48,12 @@ class NumericalSetting(Setting):
     """
 
     def __init__(
-        self, name: str, description: str, default, min_value=None, max_value=None
+        self, name: str, category: str, description: str, default, min_value=None, max_value=None
     ) -> None:
         """Create a new numerical setting."""
         super().__init__(
             name,
+            category,
             self.description_limit_info(description, min_value, max_value),
             default,
         )
@@ -81,6 +84,7 @@ class FloatSetting(NumericalSetting):
 
     Args:
         name (str) : The name of the setting
+        category (str) : The category of the setting
         default : The default value of the setting
         description (str) : A description of the setting
         min_value : The minimum value of the setting
@@ -92,14 +96,14 @@ class FloatSetting(NumericalSetting):
     def __init__(
         self,
         name: str,
+        category: str,
         default: float,
         description: str,
         min_value: float = None,
         max_value: float = None,
     ) -> None:
         """Create a new float setting."""
-        super().__init__(name, description, default, min_value, max_value)
-
+        super().__init__(name, category, description, default, min_value, max_value)
     @property
     def value(self):
         """The value of the setting. In this case, a float."""
@@ -107,7 +111,7 @@ class FloatSetting(NumericalSetting):
 
     @value.setter
     def value(self, value):
-        logger.debug(f"Setting {self.name} to {value}")
+        logger.debug(f"Setting {self.name} to {value}")      
         self._value = float(value)
 
 
@@ -116,6 +120,7 @@ class IntSetting(NumericalSetting):
 
     Args:
         name (str) : The name of the setting
+        category (str) : The category of the setting
         default : The default value of the setting
         description (str) : A description of the setting
         min_value : The minimum value of the setting
@@ -125,13 +130,15 @@ class IntSetting(NumericalSetting):
     def __init__(
         self,
         name: str,
+        category: str,
         default: int,
         description: str,
         min_value=None,
         max_value=None,
     ) -> None:
         """Create a new int setting."""
-        super().__init__(name, description, default, min_value, max_value)
+        super().__init__(name, category, description, default, min_value, max_value)
+
 
     @property
     def value(self):
@@ -142,6 +149,7 @@ class IntSetting(NumericalSetting):
     def value(self, value):
         logger.debug(f"Setting {self.name} to {value}")
         value = int(float(value))
+        
         self._value = value
 
 
@@ -150,13 +158,14 @@ class BooleanSetting(Setting):
 
     Args:
         name (str) : The name of the setting
+        category (str) : The category of the setting
         default : The default value of the setting
         description (str) : A description of the setting
     """
 
-    def __init__(self, name: str, default: bool, description: str) -> None:
+    def __init__(self, name: str, category : str, default: bool, description: str) -> None:
         """Create a new boolean setting."""
-        super().__init__(name, description, default)
+        super().__init__(name, category, description, default)
 
 
     @property
@@ -178,16 +187,17 @@ class SelectionSetting(Setting):
 
     Args:
         name (str) : The name of the setting
+        category (str) : The category of the setting
         options (list) : A list of options to choose from
         default : The default value of the setting
         description (str) : A description of the setting
     """
 
     def __init__(
-        self, name: str, options: list, default: str, description: str
+        self, name: str, category : str, options: list, default: str, description: str
     ) -> None:
         """Create a new selection setting."""
-        super().__init__(name, description, default)
+        super().__init__(name, category, description, default)
         # Check if default is in options
         if default not in options:
             raise ValueError("Default value must be one of the options")
@@ -206,7 +216,7 @@ class SelectionSetting(Setting):
             if value in self.options:
                 self._value = value
             else:
-                raise ValueError("Value must be one of the options")
+                raise ValueError(f"Value must be one of the options {self.options}")
         # This fixes a bug when creating the widget when the options are not yet set
         except AttributeError:
             self._value = value
@@ -219,13 +229,14 @@ class StringSetting(Setting):
 
     Args:
         name (str) : The name of the setting
+        category (str) : The category of the setting
         default : The default value of the setting
         description (str) : A description of the setting
     """
 
-    def __init__(self, name: str, default: str, description: str) -> None:
+    def __init__(self, name: str, category :str, default: str, description: str) -> None:
         """Create a new string setting."""
-        super().__init__(name, description, default)
+        super().__init__(name, category, description, default)
 
     @property
     def value(self):
