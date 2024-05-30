@@ -229,7 +229,6 @@ class SelectionSetting(Setting):
         except AttributeError:
             self._value = value
             self.options = [value]
-            self.settings_changed.emit()
 
 
 class StringSetting(Setting):
