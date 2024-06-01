@@ -1,7 +1,10 @@
+"""Options for the pulse parameters. Options can be of different types, for example boolean, numeric or function. Generally pulse parameters have different values for the different events in a pulse sequence."""
+
 import logging
 from quackseq.functions import Function
 
 logger = logging.getLogger(__name__)
+
 
 class Option:
     """Defines options for the pulse parameters which can then be set accordingly.
@@ -102,6 +105,7 @@ class NumericOption(Option):
             is_float (bool): If the value is a float.
             min_value: The minimum value of the option.
             max_value: The maximum value of the option.
+            slider (bool): If the option should be displayed as a slider. This is not used for the pulseq module, but visualizations can use this information.
         """
         super().__init__(name, value)
         self.is_float = is_float
@@ -116,7 +120,7 @@ class NumericOption(Option):
             self.value_changed.emit()
         elif value >= self.max_value:
             self.value = self.max_value
-            self.value_changed.emit() 
+            self.value_changed.emit()
         else:
             raise ValueError(
                 f"Value {value} is not in the range of {self.min_value} to {self.max_value}. This should have been caught earlier."

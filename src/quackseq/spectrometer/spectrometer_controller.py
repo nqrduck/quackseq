@@ -7,7 +7,8 @@ from quackseq.pulsesequence import QuackSequence
 
 logger = logging.getLogger(__name__)
 
-class SpectrometerController():
+
+class SpectrometerController:
     """The base class for all spectrometer controllers."""
 
     def run_sequence(self, sequence):
@@ -17,14 +18,14 @@ class SpectrometerController():
         """
         raise NotImplementedError
 
-    def set_frequency(self, value : float):
+    def set_frequency(self, value: float):
         """Sets the frequency of the spectrometer."""
         raise NotImplementedError
 
-    def set_averages(self, value : int):
+    def set_averages(self, value: int):
         """Sets the number of averages."""
         raise NotImplementedError
-    
+
     def translate_rx_event(self, sequence: QuackSequence) -> tuple:
         """This method translates the RX event of the pulse sequence to the limr object.
 
@@ -62,7 +63,7 @@ class SpectrometerController():
 
         else:
             return None, None
-        
+
     def calculate_simulation_length(self, sequence: QuackSequence) -> float:
         """This method calculates the simulation length based on the settings and the pulse sequence.
 

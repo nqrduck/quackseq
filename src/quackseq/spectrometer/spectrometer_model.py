@@ -2,29 +2,54 @@
 
 import logging
 from collections import OrderedDict
-from typing import Any
 from quackseq.spectrometer.spectrometer_settings import Setting
 
 logger = logging.getLogger(__name__)
 
+
 class QuackSettings(OrderedDict):
+    """The Quack settings class makes the different settings of the spectrometer accessible as attributes. Additionally, it provides methods to get the settings by category."""
+
     def __getattr__(self, key):
+        """Gets the value of a setting by its key.
+
+        Args:
+            key (str) : The key of the setting
+
+        Returns:
+            The value of the setting
+        """
         return self[key].value
 
     def __setattr__(self, key, value):
+        """Sets the value of a setting by its key.
+
+        Args:
+            key (str) : The key of the setting
+            value : The value to set
+        """
         self[key].value = value
 
     @property
     def categories(self):
+        """The categories of the settings."""
         categories = []
 
         for setting in self.values():
-            if not setting.category in categories:
+            if setting.category not in categories:
                 categories.append(setting.category)
 
         return categories
-        
+
     def get_settings_by_category(self, category):
+        """Gets the settings by category.
+
+        Args:
+            category (str) : The category of the settings
+
+        Returns:
+            dict : The settings with the specified category
+        """
         settings = dict()
 
         for key, setting in self.items():
@@ -33,7 +58,8 @@ class QuackSettings(OrderedDict):
 
         return settings
 
-class SpectrometerModel():
+
+class SpectrometerModel:
     """The base class for all spectrometer models.
 
     It contains the settings and pulse parameters of the spectrometer.
@@ -48,8 +74,7 @@ class SpectrometerModel():
         """Initializes the spectrometer model."""
         self.settings = QuackSettings()
 
-
-    def add_setting(self,name: str, setting: Setting) -> None:
+    def add_setting(self, name: str, setting: Setting) -> None:
         """Adds a setting to the spectrometer.
 
         Args:
@@ -72,10 +97,10 @@ class SpectrometerModel():
         """
         if name in self.settings:
             return self.settings[name]
-        
+
         raise ValueError(f"No setting with name {name} found")
-    
-    def get_setting_by_display_name(self, display_name : str) -> Setting:
+
+    def get_setting_by_display_name(self, display_name: str) -> Setting:
         """Gets a setting by its display name.
 
         Args:
@@ -92,7 +117,7 @@ class SpectrometerModel():
                 return setting
 
         raise ValueError(f"No setting with display name {display_name} found")
-    
+
     @property
     def target_frequency(self):
         """The target frequency of the spectrometer in Hz. This is the frequency where the magnetic resonance experiment is performed."""

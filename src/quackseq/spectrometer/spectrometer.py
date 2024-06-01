@@ -1,7 +1,7 @@
-from typing import Any
+"""The base class for the spectrometer used in quackseq. This class is just a skeleton and should be inherited by all spectrometer implementations."""
 
 
-class Spectrometer():
+class Spectrometer:
     """Base class for spectrometers.
 
     This class should be inherited by all spectrometers.
@@ -15,11 +15,10 @@ class Spectrometer():
         """
         raise NotImplementedError
 
-    def set_frequency(self, value : float):
+    def set_frequency(self, value: float):
         """Sets the frequency of the spectrometer."""
         raise NotImplementedError
 
-    def set_averages(self, value : int):
+    def set_averages(self, value: int):
         """Sets the number of averages."""
         raise NotImplementedError
-    

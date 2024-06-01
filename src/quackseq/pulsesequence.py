@@ -62,8 +62,10 @@ class PulseSequence:
             event (Event): The event to add
         """
         if event.name in self.get_event_names():
-            raise ValueError(f"Event with name {event.name} already exists in the pulse sequence")
-        
+            raise ValueError(
+                f"Event with name {event.name} already exists in the pulse sequence"
+            )
+
         self.events.append(event)
 
     def create_event(self, event_name: str, duration: str) -> "Event":
@@ -78,8 +80,10 @@ class PulseSequence:
         """
         event = Event(event_name, duration, self)
         if event.name in self.get_event_names():
-            raise ValueError(f"Event with name {event.name} already exists in the pulse sequence")
-        
+            raise ValueError(
+                f"Event with name {event.name} already exists in the pulse sequence"
+            )
+
         self.events.append(event)
         return event
 
@@ -224,7 +228,13 @@ class QuackSequence(PulseSequence):
         self.add_pulse_parameter_option(self.RX_READOUT, RXReadout)
 
     def add_blank_event(self, event_name: str, duration: float):
-        event = self.create_event(event_name, duration)
+        """Adds a blank event to the pulse sequence.
+
+        Args:
+            event_name (str): The name of the event
+            duration (float): The duration of the event with a unit suffix (n, u, m)
+        """
+        _ = self.create_event(event_name, duration)
 
     def add_pulse_event(
         self,
@@ -234,24 +244,44 @@ class QuackSequence(PulseSequence):
         phase: float,
         shape: Function = RectFunction(),
     ):
+        """Adds a pulse event to the pulse sequence.
+
+        Args:
+            event_name (str): The name of the event
+            duration (float): The duration of the event with a unit suffix (n, u, m)
+            amplitude (float): The amplitude of the transmit pulse in percent
+            phase (float): The phase of the transmit pulse
+            shape (Function): The shape of the transmit pulse
+        """
         event = self.create_event(event_name, duration)
         self.set_tx_amplitude(event, amplitude)
         self.set_tx_phase(event, phase)
         self.set_tx_shape(event, shape)
 
     def add_readout_event(self, event_name: str, duration: float):
+        """Adds a readout event to the pulse sequence.
+
+        Args:
+            event_name (str): The name of the event
+            duration (float): The duration of the event with a unit suffix (n, u, m)
+        """
         event = self.create_event(event_name, duration)
         self.set_rx(event, True)
 
     # TX Specific functions
 
     def set_tx_amplitude(self, event, amplitude: float) -> None:
-        """Sets the amplitude of the transmitter.
+        """Sets the relative amplitude of the transmit pulse in percent (larger 0 - max 100).
 
         Args:
             event (Event): The event to set the amplitude for
-            amplitude (float): The amplitude of the transmitter
+            amplitude (float): The amplitude of the transmit pulse in percent
         """
+        if amplitude <= 0 or amplitude > 100:
+            raise ValueError(
+                "Amplitude needs to be larger than 0 and smaller or equal to 100"
+            )
+
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.RELATIVE_AMPLITUDE
         ).value = amplitude
@@ -268,11 +298,11 @@ class QuackSequence(PulseSequence):
         ).value = phase
 
     def set_tx_shape(self, event, shape: Function) -> None:
-        """Sets the shape of the transmitter.
+        """Sets the shape of the transmit pulse.
 
         Args:
             event (Event): The event to set the shape for
-            shape (Any): The shape of the transmitter
+            shape (Function): The shape of the transmit pulse
         """
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.TX_PULSE_SHAPE

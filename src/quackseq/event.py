@@ -1,3 +1,5 @@
+"""Event class for the pulse sequence. Every pulse sequence consists of events, that are executed subsequently and have different parameters."""
+
 import logging
 from collections import OrderedDict
 
@@ -21,7 +23,9 @@ class Event:
         pulse_sequence (PulseSequence): The pulse sequence the event belongs to
     """
 
-    def __init__(self, name: str, duration: float | str, pulse_sequence : "PulseSequence") -> None:
+    def __init__(
+        self, name: str, duration: float | str, pulse_sequence: "PulseSequence"
+    ) -> None:
         """Initializes the event."""
         self.parameters = OrderedDict()
         self.name = name
@@ -36,9 +40,7 @@ class Event:
         pulse_parameters = self.pulse_sequence.pulse_parameter_options
         for name, pulse_parameter_class in pulse_parameters.items():
             logger.debug("Adding pulse parameter %s to event %s", name, self.name)
-            self.parameters[name] = pulse_parameter_class(
-                name
-            )
+            self.parameters[name] = pulse_parameter_class(name)
             logger.debug(
                 "Created pulse parameter %s with object id %s",
                 name,
