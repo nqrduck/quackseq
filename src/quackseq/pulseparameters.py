@@ -10,66 +10,70 @@ import logging
 from numpy.core.multiarray import array as array
 
 from quackseq.options import BooleanOption, FunctionOption, NumericOption, Option
-from quackseq.functions import RectFunction, SincFunction, GaussianFunction, CustomFunction
+from quackseq.functions import (
+    RectFunction,
+    SincFunction,
+    GaussianFunction,
+    CustomFunction,
+)
 
 logger = logging.getLogger(__name__)
 
 
 class PulseParameter:
-        """A pulse parameter is a value that can be different for each event in a pulse sequence.
+    """A pulse parameter is a value that can be different for each event in a pulse sequence.
 
-        E.g. the transmit pulse power or the phase of the transmit pulse.
+    E.g. the transmit pulse power or the phase of the transmit pulse.
+
+    Args:
+        name (str) : The name of the pulse parameter
+
+    Attributes:
+        name (str) : The name of the pulse parameter
+        options (OrderedDict) : The options of the pulse parameter
+    """
+
+    def __init__(self, name: str):
+        """Initializes the pulse parameter.
+
+        Arguments:
+            name (str) : The name of the pulse parameter
+        """
+        self.name = name
+        self.options = list()
+
+    def add_option(self, option: Option) -> None:
+        """Adds an option to the pulse parameter.
 
         Args:
-            name (str) : The name of the pulse parameter
-
-        Attributes:
-            name (str) : The name of the pulse parameter
-            options (OrderedDict) : The options of the pulse parameter
+            option (Option) : The option to add
         """
+        self.options.append(option)
 
-        def __init__(self, name: str):
-            """Initializes the pulse parameter.
+    def get_options(self) -> list:
+        """Gets the options of the pulse parameter.
 
-            Arguments:
-                name (str) : The name of the pulse parameter
-            """
-            self.name = name
-            self.options = list()
+        Returns:
+            list : The options of the pulse parameter
+        """
+        return self.options
 
-        def add_option(self, option: Option) -> None:
-            """Adds an option to the pulse parameter.
+    def get_option_by_name(self, name: str) -> Option:
+        """Gets an option by its name.
 
-            Args:
-                option (Option) : The option to add
-            """
-            self.options.append(option)
+        Args:
+            name (str) : The name of the option
 
-        def get_options(self) -> list:
-            """Gets the options of the pulse parameter.
+        Returns:
+            Option : The option with the specified name
 
-            Returns:
-                list : The options of the pulse parameter
-            """
-            return self.options
-
-        def get_option_by_name(self, name: str) -> Option:
-            """Gets an option by its name.
-
-            Args:
-                name (str) : The name of the option
-
-            Returns:
-                Option : The option with the specified name
-
-            Raises:
-                ValueError : If no option with the specified name is found
-            """
-            for option in self.options:
-                if option.name == name:
-                    return option
-            raise ValueError(f"Option with name {name} not found")
-
+        Raises:
+            ValueError : If no option with the specified name is found
+        """
+        for option in self.options:
+            if option.name == name:
+                return option
+        raise ValueError(f"Option with name {name} not found")
 
 
 class TXPulse(PulseParameter):
@@ -104,12 +108,22 @@ class TXPulse(PulseParameter):
         self.add_option(NumericOption(self.TX_PHASE, 0))
         self.add_option(
             NumericOption(
-                self.N_PHASE_CYCLES, 1, is_float=False, min_value=1, max_value=360, slider=False
+                self.N_PHASE_CYCLES,
+                1,
+                is_float=False,
+                min_value=1,
+                max_value=360,
+                slider=False,
             )
         )
         self.add_option(
             NumericOption(
-                self.PHASE_CYCLE_LEVEL, 0, is_float=False, min_value=0, max_value=10, slider=False
+                self.PHASE_CYCLE_LEVEL,
+                0,
+                is_float=False,
+                min_value=0,
+                max_value=10,
+                slider=False,
             )
         )
         self.add_option(
@@ -123,6 +137,7 @@ class TXPulse(PulseParameter):
                 ],
             ),
         )
+
 
 class RXReadout(PulseParameter):
     """Basic PulseParameter for the RX Readout. It includes an option for the RX Readout state.
@@ -143,6 +158,7 @@ class RXReadout(PulseParameter):
         """
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
+
 
 class Gate(PulseParameter):
     """Basic PulseParameter for the Gate. It includes an option for the Gate state.

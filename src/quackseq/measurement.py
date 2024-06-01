@@ -337,7 +337,8 @@ class T2StarFit(Fit):
     def initial_guess(self) -> list:
         """Initial guess for the T2* fit."""
         return [1, 1]
-    
+
+
 class LorentzianFit(Fit):
     """Lorentzian fit for measurement data."""
 

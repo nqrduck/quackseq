@@ -134,7 +134,7 @@ class Function:
         """
         return {
             "name": self.name,
-            "class" : self.__class__.__name__,
+            "class": self.__class__.__name__,
             "parameters": [parameter.to_json() for parameter in self.parameters],
             "expression": str(self.expr),
             "resolution": self.resolution,
