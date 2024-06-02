@@ -102,6 +102,7 @@ class FloatSetting(NumericalSetting):
         min_value : The minimum value of the setting
         max_value : The maximum value of the setting
         slider : If the setting should be displayed as a slider (only in the GUI not used in this GUI)
+        suffix : The suffix that is added to the value of the QSpinBox
     """
 
     DEFAULT_LENGTH = 100
@@ -115,10 +116,12 @@ class FloatSetting(NumericalSetting):
         min_value: float = None,
         max_value: float = None,
         slider=False,
+        suffix="",
     ) -> None:
         """Create a new float setting."""
         super().__init__(name, category, description, default, min_value, max_value)
         self.slider = slider
+        self.suffix = suffix
 
     @property
     def value(self):
@@ -141,6 +144,8 @@ class IntSetting(NumericalSetting):
         description (str) : A description of the setting
         min_value : The minimum value of the setting
         max_value : The maximum value of the setting
+        slider : If the setting should be displayed as a slider (only in the GUI not used in this GUI)
+        suffix : The suffix that is added to the value of the QSpinBox
     """
 
     def __init__(
@@ -152,10 +157,12 @@ class IntSetting(NumericalSetting):
         min_value=None,
         max_value=None,
         slider=False,
+        suffix="",
     ) -> None:
         """Create a new int setting."""
         super().__init__(name, category, description, default, min_value, max_value)
         self.slider = slider
+        self.suffix = suffix
 
     @property
     def value(self):
