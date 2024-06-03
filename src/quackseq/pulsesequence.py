@@ -249,7 +249,7 @@ class QuackSequence(PulseSequence):
         Args:
             event_name (str): The name of the event
             duration (float): The duration of the event with a unit suffix (n, u, m)
-            amplitude (float): The amplitude of the transmit pulse in percent
+            amplitude (float): The amplitude of the transmit pulse in percent (min 0, max 100)
             phase (float): The phase of the transmit pulse
             shape (Function): The shape of the transmit pulse
         """
