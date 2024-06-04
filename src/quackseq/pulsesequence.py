@@ -258,7 +258,7 @@ class QuackSequence(PulseSequence):
         self.set_tx_phase(event, phase)
         self.set_tx_shape(event, shape)
 
-    def add_readout_event(self, event_name: str, duration: float):
+    def add_readout_event(self, event_name: str, duration: float, phase: float = 0):
         """Adds a readout event to the pulse sequence.
 
         Args:
@@ -267,6 +267,7 @@ class QuackSequence(PulseSequence):
         """
         event = self.create_event(event_name, duration)
         self.set_rx(event, True)
+        self.set_rx_phase(event, phase)
 
     # TX Specific functions
 
@@ -318,3 +319,14 @@ class QuackSequence(PulseSequence):
             rx (bool): The receiver state
         """
         event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx
+
+    def set_rx_phase(self, event, phase: float) -> None:
+        """Sets the phase of the receiver.
+
+        Args:
+            event (Event): The event to set the phase for
+            phase (float): The phase of the receiver
+        """
+        event.parameters[self.RX_READOUT].get_option_by_name(
+            RXReadout.PHASE
+        ).value = phase
