@@ -3,6 +3,7 @@
 import logging
 import numpy as np
 from scipy.optimize import curve_fit
+from numpy.fft import ifft, fft
 
 from quackseq.functions import Function
 from quackseq.signalprocessing import SignalProcessing as sp
@@ -18,8 +19,8 @@ class Measurement:
 
     Args:
         name (str): Name of the measurement.
-        tdx (np.array): Time axis for the x axis of the measurement data.
-        tdy (np.array): Time axis for the y axis of the measurement data.
+        tdx (np.array): Time axis for the x axis of the measurement data. This can be multi-dimensional.
+        tdy (np.array): Time axis for the y axis of the measurement data. This can be multi-dimensional.
         target_frequency (float): Target frequency of the measurement.
         frequency_shift (float, optional): Frequency shift of the measurement. Defaults to 0.
         IF_frequency (float, optional): Intermediate frequency of the measurement. Defaults to 0.
@@ -77,6 +78,18 @@ class Measurement:
             IF_frequency=self.IF_frequency,
         )
         return apodized_measurement
+    
+    def phase_shift(self, phase: float, axis = 0) -> np.array:
+        """Applies a phase shift to the measurement data.
+        
+        Args:
+            phase (float): Phase shift in degrees.
+            axis (int): Axis to apply the phase shift to. Defaults to 0.
+        """
+        spec = fft(self.tdy)
+        shifted_signal = np.exp(1j * np.deg2rad(phase)) * spec
+        
+        self.tdy = ifft(shifted_signal, n=len(self.tdy))
 
     def add_fit(self, fit: "Fit") -> None:
         """Adds a fit to the measurement.

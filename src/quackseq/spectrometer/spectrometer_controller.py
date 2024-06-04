@@ -30,7 +30,7 @@ class SpectrometerController:
         """This method translates the RX event of the pulse sequence to the limr object.
 
         Returns:
-        tuple: A tuple containing the start and stop time of the RX event in µs
+        tuple: A tuple containing the start and stop time of the RX event in µs and the phase of the RX event.
         """
         # This is a correction factor for the RX event. The offset of the first pulse is 2.2µs longer than from the specified samples.
         events = sequence.events
@@ -55,14 +55,15 @@ class SpectrometerController:
                         [event.duration for event in previous_events]
                     )
                     rx_duration = event.duration
+                    phase = parameter.get_option_by_name(RXReadout.PHASE).value
 
         rx_begin = float(previous_events_duration)
         if rx_duration:
             rx_stop = rx_begin + float(rx_duration)
-            return rx_begin * 1e6, rx_stop * 1e6
+            return rx_begin * 1e6, rx_stop * 1e6, phase
 
         else:
-            return None, None
+            return None, None, None
 
     def calculate_simulation_length(self, sequence: QuackSequence) -> float:
         """This method calculates the simulation length based on the settings and the pulse sequence.

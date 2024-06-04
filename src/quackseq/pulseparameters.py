@@ -149,7 +149,8 @@ class RXReadout(PulseParameter):
         RX (str): The RX Readout state.
     """
 
-    RX = "RX"
+    RX = "Enable RX Readout"
+    PHASE = "RX Phase (°)"
 
     def __init__(self, name) -> None:
         """Initializes the RX Readout PulseParameter.
@@ -158,6 +159,11 @@ class RXReadout(PulseParameter):
         """
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
+
+        # Receiver Phase
+        self.add_option(
+            NumericOption(self.PHASE, 0, min_value=0, max_value=360, is_float=True)
+        )
 
 
 class Gate(PulseParameter):
