@@ -146,6 +146,7 @@ class IntSetting(NumericalSetting):
         max_value : The maximum value of the setting
         slider : If the setting should be displayed as a slider (only in the GUI not used in this GUI)
         suffix : The suffix that is added to the value of the QSpinBox
+        scientific_notation : If the value should be displayed in scientific notation
     """
 
     def __init__(
@@ -158,11 +159,13 @@ class IntSetting(NumericalSetting):
         max_value=None,
         slider=False,
         suffix="",
+        scientific_notation=False,
     ) -> None:
         """Create a new int setting."""
         super().__init__(name, category, description, default, min_value, max_value)
         self.slider = slider
         self.suffix = suffix
+        self.scientific_notation = scientific_notation
 
     @property
     def value(self):
