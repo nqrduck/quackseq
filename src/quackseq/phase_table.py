@@ -96,7 +96,7 @@ class PhaseTable:
             for parameter, phase_values in parameters.items():
                 if len(phase_values) < max_phase_values:
                     phase_values = np.tile(
-                        phase_values, max_phase_values // len(phase_values)
+                        phase_values, int(np.ceil(max_phase_values / len(phase_values)))
                     )
                     pulse_phases[parameter] = phase_values
                     logger.info(
