@@ -83,7 +83,6 @@ class PulseSequence:
             raise ValueError(
                 f"Event with name {event.name} already exists in the pulse sequence"
             )
-
         self.events.append(event)
         return event
 
@@ -308,6 +307,28 @@ class QuackSequence(PulseSequence):
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.TX_PULSE_SHAPE
         ).value = shape
+
+    def set_tx_n_phase_cycles(self, event, n_phase_cycles: int) -> None:
+        """Sets the number of phase cycles for the transmit pulse.
+
+        Args:
+            event (Event): The event to set the number of phase cycles for
+            n_phase_cycles (int): The number of phase cycles
+        """
+        event.parameters[self.TX_PULSE].get_option_by_name(
+            TXPulse.N_PHASE_CYCLES
+        ).value = n_phase_cycles
+
+    def set_tx_phase_cycle_group(self, event, phase_cycle_group: int) -> None:
+        """Sets the phase cycle group for the transmit pulse.
+
+        Args:
+            event (Event): The event to set the phase cycle group for
+            phase_cycle_group (int): The phase cycle group
+        """
+        event.parameters[self.TX_PULSE].get_option_by_name(
+            TXPulse.PHASE_CYCLE_GROUP
+        ).value = phase_cycle_group
 
     # RX Specific functions
 

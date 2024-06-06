@@ -7,6 +7,7 @@ Todo:
 from __future__ import annotations
 import logging
 
+import numpy as np
 from numpy.core.multiarray import array as array
 
 from quackseq.options import BooleanOption, FunctionOption, NumericOption, Option
@@ -87,7 +88,7 @@ class TXPulse(PulseParameter):
     TX_PHASE = "TX Phase"
     TX_PULSE_SHAPE = "TX Pulse Shape"
     N_PHASE_CYCLES = "Number of Phase Cycles"
-    PHASE_CYCLE_LEVEL = "Phase Cycle Level"
+    PHASE_CYCLE_GROUP = "Phase Cycle Group"
 
     def __init__(self, name: str) -> None:
         """Initializes the TX Pulse Parameter.
@@ -118,7 +119,7 @@ class TXPulse(PulseParameter):
         )
         self.add_option(
             NumericOption(
-                self.PHASE_CYCLE_LEVEL,
+                self.PHASE_CYCLE_GROUP,
                 0,
                 is_float=False,
                 min_value=0,
@@ -137,6 +138,18 @@ class TXPulse(PulseParameter):
                 ],
             ),
         )
+
+    def get_phases(self):
+        """Gets the phase of the TX Pulse.
+
+        Returns:
+            np.array : The phases of the TX Pulse
+        """
+        n_phase_cycles = self.get_option_by_name(self.N_PHASE_CYCLES).value
+
+        phase = self.get_option_by_name(self.TX_PHASE).value
+
+        return (np.linspace(0, 360, n_phase_cycles, endpoint=False) + phase) % 360
 
 
 class RXReadout(PulseParameter):
