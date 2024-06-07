@@ -56,8 +56,8 @@ class Measurement:
         self.fdy = [fdy]
         self.fits = []
 
-    def add_data(self, tdx: np.array, tdy: np.array) -> None:
-        """Adds data to the measurement.
+    def add_dataset(self, tdx: np.array, tdy: np.array) -> None:
+        """Adds dataset to the measurement.
 
         Args:
             tdx (np.array): Time axis for the x axis of the measurement data.
@@ -65,7 +65,9 @@ class Measurement:
         """
         self.tdx.append(tdx)
         self.tdy.append(tdy)
-        self.fdx, self.fdy = sp.fft(tdx, tdy, self.frequency_shift)
+        fdx, fdy = sp.fft(tdx, tdy, self.frequency_shift)
+        self.fdx.append(fdx)
+        self.fdy.append(fdy)
 
     def apodization(self, function: Function) -> "Measurement":
         """Applies apodization to the measurement data.
