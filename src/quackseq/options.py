@@ -232,3 +232,39 @@ class FunctionOption(Option):
         obj = cls(data["name"], functions)
         obj.value = Function.from_json(data["value"])
         return obj
+    
+class TableOption(Option):
+    """A table option has rows and columns and can be used to store a table of values. The value is a list of lists."""
+
+    def __init__(self, name: str, value) -> None:
+        """Initializes the table option."""
+        super().__init__(name, value)
+
+    def set_value(self, value):
+        """Sets the value of the option."""
+        self.value = value
+
+    def to_json(self):
+        """Returns a json representation of the option.
+
+        Returns:
+            dict: The json representation of the option.
+        """
+        return {
+            "name": self.name,
+            "value": self.value,
+            "class": self.__class__.__name__,
+        }
+
+    @classmethod
+    def from_json(cls, data):
+        """Creates a TableOption from a json representation.
+
+        Args:
+            data (dict): The json representation of the TableOption.
+
+        Returns:
+            TableOption: The TableOption.
+        """
+        obj = cls(data["name"], data["value"])
+        return obj

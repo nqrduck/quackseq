@@ -55,12 +55,12 @@ class SpectrometerController:
                         [event.duration for event in previous_events]
                     )
                     rx_duration = event.duration
-                    phase = parameter.get_option_by_name(RXReadout.PHASE).value
+                    readout_scheme = parameter.get_option_by_name(RXReadout.READOUT_SCHEME).value
 
         rx_begin = float(previous_events_duration)
         if rx_duration:
             rx_stop = rx_begin + float(rx_duration)
-            return rx_begin * 1e6, rx_stop * 1e6, phase
+            return rx_begin * 1e6, rx_stop * 1e6, readout_scheme
 
         else:
             return None, None, None

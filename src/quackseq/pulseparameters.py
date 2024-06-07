@@ -10,7 +10,13 @@ import logging
 import numpy as np
 from numpy.core.multiarray import array as array
 
-from quackseq.options import BooleanOption, FunctionOption, NumericOption, Option
+from quackseq.options import (
+    BooleanOption,
+    FunctionOption,
+    NumericOption,
+    Option,
+    TableOption,
+)
 from quackseq.functions import (
     RectFunction,
     SincFunction,
@@ -163,7 +169,7 @@ class RXReadout(PulseParameter):
     """
 
     RX = "Enable RX Readout"
-    PHASE = "RX Phase (°)"
+    READOUT_SCHEME = "Readout Scheme"
 
     def __init__(self, name) -> None:
         """Initializes the RX Readout PulseParameter.
@@ -173,10 +179,8 @@ class RXReadout(PulseParameter):
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
 
-        # Receiver Phase
-        self.add_option(
-            NumericOption(self.PHASE, 0, min_value=0, max_value=360, is_float=True)
-        )
+        # Readout Scheme for phase cycling - default is a positive sign with a 0 phase
+        self.add_option(TableOption(self.READOUT_SCHEME, [[1, 0]]))
 
 
 class Gate(PulseParameter):

@@ -260,7 +260,7 @@ class QuackSequence(PulseSequence):
         self.set_tx_phase(event, phase)
         self.set_tx_shape(event, shape)
 
-    def add_readout_event(self, event_name: str, duration: float, phase: float = 0):
+    def add_readout_event(self, event_name: str, duration: float):
         """Adds a readout event to the pulse sequence.
 
         Args:
@@ -269,7 +269,6 @@ class QuackSequence(PulseSequence):
         """
         event = self.create_event(event_name, duration)
         self.set_rx(event, True)
-        self.set_rx_phase(event, phase)
 
     # TX Specific functions
 
@@ -344,13 +343,24 @@ class QuackSequence(PulseSequence):
         """
         event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx
 
-    def set_rx_phase(self, event, phase: float) -> None:
-        """Sets the phase of the receiver.
+    def set_rx_readout_scheme(self, event, readout_scheme: list) -> None:
+        """Sets the readout scheme of the receiver.
 
         Args:
-            event (Event): The event to set the phase for
-            phase (float): The phase of the receiver
+            event (Event): The event to set the readout scheme for
+            readout_scheme (list): The readout scheme of the receiver
         """
+        # Check that the readout scheme is valid
+        self.phase_table.update_phase_array()
+        n_cycles = self.phase_table.n_phase_cycles
+
+        rows = len(readout_scheme)
+
+        if rows != n_cycles:
+            raise ValueError(
+                f"Readout scheme needs to have {n_cycles} cycles, but has {rows}"
+            )
+
         event.parameters[self.RX_READOUT].get_option_by_name(
-            RXReadout.PHASE
-        ).value = phase
+            RXReadout.READOUT_SCHEME
+        ).value = readout_scheme

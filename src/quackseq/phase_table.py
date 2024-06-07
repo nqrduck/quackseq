@@ -185,27 +185,6 @@ class PhaseTable:
         self._phase_array = phase_array
 
     @property
-    def rx_phase_sign(self) -> list:
-        return self._rx_phase_sign
-
-    @rx_phase_sign.setter
-    def rx_phase_sign(self, rx_phase_sign: list):
-        """The phase sign of the RX pulse.
-
-        Args:
-            rx_phase_sign (list): A list of phase signs for the RX pulse. The different entries are tuples with the first element being the sign and the second element being the phase.
-        """
-
-        # Check that the rx_phase_sign has the same length as the number of rows in the phase table
-
-        if len(rx_phase_sign) != self.phase_array.shape[0]:
-            raise ValueError(
-                f"The number of rows in the phase table is {self.phase_table.shape[0]} but the length of the rx_phase_sign is {len(rx_phase_sign)}"
-            )
-        
-        self._rx_phase_sign = rx_phase_sign
-
-    @property
     def n_phase_cycles(self) -> int:
         return self.phase_array.shape[0]
     
