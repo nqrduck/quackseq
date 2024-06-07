@@ -19,15 +19,15 @@ class Measurement:
 
     Args:
         name (str): Name of the measurement.
-        tdx (np.array): Time axis for the x axis of the measurement data. This can be multi-dimensional.
-        tdy (np.array): Time axis for the y axis of the measurement data. This can be multi-dimensional.
+        tdx (np.array): Time axis for the x axis of the measurement data. This can be multi-dimensional. Axis 0 are the different data sets (e.g. phase cycles).
+        tdy (np.array): Time axis for the y axis of the measurement data. This can be multi-dimensional. Axis 0 are the different data sets (e.g. phase cycles).
         target_frequency (float): Target frequency of the measurement.
         frequency_shift (float, optional): Frequency shift of the measurement. Defaults to 0.
         IF_frequency (float, optional): Intermediate frequency of the measurement. Defaults to 0.
 
     Attributes:
-        tdx (np.array): Time axis for the x axis of the measurement data.
-        tdy (np.array): Time axis for the y axis of the measurement data.
+        tdx (np.array): Time axis for the x axis of the measurement data. Axis 0 are the different data sets (e.g. phase cycles).
+        tdy (np.array): Time axis for the y axis of the measurement data. Axis 0 are the different data sets (e.g. phase cycles).
         target_frequency (float): Target frequency of the measurement.
         frequency_shift (float): Frequency shift of the measurement.
         IF_frequency (float): Intermediate frequency of the measurement.
@@ -46,13 +46,26 @@ class Measurement:
     ) -> None:
         """Initializes the measurement."""
         self.name = name
-        self.tdx = tdx
-        self.tdy = tdy
+        self.tdx = [tdx]
+        self.tdy = [tdy]
         self.target_frequency = target_frequency
         self.frequency_shift = frequency_shift
         self.IF_frequency = IF_frequency
-        self.fdx, self.fdy = sp.fft(tdx, tdy, frequency_shift)
+        fdx, fdy = sp.fft(tdx, tdy, frequency_shift)
+        self.fdx = [fdx]
+        self.fdy = [fdy]
         self.fits = []
+
+    def add_data(self, tdx: np.array, tdy: np.array) -> None:
+        """Adds data to the measurement.
+
+        Args:
+            tdx (np.array): Time axis for the x axis of the measurement data.
+            tdy (np.array): Time axis for the y axis of the measurement data.
+        """
+        self.tdx.append(tdx)
+        self.tdy.append(tdy)
+        self.fdx, self.fdy = sp.fft(tdx, tdy, self.frequency_shift)
 
     def apodization(self, function: Function) -> "Measurement":
         """Applies apodization to the measurement data.
@@ -78,18 +91,19 @@ class Measurement:
             IF_frequency=self.IF_frequency,
         )
         return apodized_measurement
-    
-    def phase_shift(self, phase: float, axis = 0) -> np.array:
+
+    def phase_shift(self, phase: float, index: int, axis=0) -> np.array:
         """Applies a phase shift to the measurement data.
-        
+
         Args:
             phase (float): Phase shift in degrees.
+            index (int): Index of the data set to apply the phase shift to.
             axis (int): Axis to apply the phase shift to. Defaults to 0.
         """
-        spec = fft(self.tdy)
+        spec = fft(self.tdy[index])
         shifted_signal = np.exp(1j * np.deg2rad(phase)) * spec
-        
-        self.tdy = ifft(shifted_signal, n=len(self.tdy))
+
+        self.tdy[index] = ifft(shifted_signal, n=len(self.tdy[index]))
 
     def add_fit(self, fit: "Fit") -> None:
         """Adds a fit to the measurement.
