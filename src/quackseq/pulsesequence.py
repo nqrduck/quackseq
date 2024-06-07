@@ -7,6 +7,7 @@ from collections import OrderedDict
 from quackseq.pulseparameters import PulseParameter, TXPulse, RXReadout
 from quackseq.functions import Function, RectFunction
 from quackseq.event import Event
+from quackseq.phase_table import PhaseTable
 
 logger = logging.getLogger(__name__)
 
@@ -225,6 +226,8 @@ class QuackSequence(PulseSequence):
 
         self.add_pulse_parameter_option(self.TX_PULSE, TXPulse)
         self.add_pulse_parameter_option(self.RX_READOUT, RXReadout)
+
+        self.phase_table = PhaseTable(self)
 
     def add_blank_event(self, event_name: str, duration: float):
         """Adds a blank event to the pulse sequence.
