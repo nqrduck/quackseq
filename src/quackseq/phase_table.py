@@ -63,7 +63,7 @@ class PhaseTable:
         logger.info(phase_table)
 
         # Now get the maximum phase group
-        max_phase_group = max([phase_group for phase_group, _ in phase_table.values()])
+        max_phase_group = int(max([phase_group for phase_group, _ in phase_table.values()]))
 
         logger.info(f"Max phase group: {max_phase_group}")
 

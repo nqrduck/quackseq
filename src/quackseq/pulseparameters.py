@@ -155,7 +155,7 @@ class TXPulse(PulseParameter):
 
         phase = self.get_option_by_name(self.TX_PHASE).value
 
-        return (np.linspace(0, 360, n_phase_cycles, endpoint=False) + phase) % 360
+        return (np.linspace(0, 360, int(n_phase_cycles), endpoint=False) + phase) % 360
 
 
 class RXReadout(PulseParameter):
