@@ -98,6 +98,19 @@ class PulseSequence:
                 self.events.remove(event)
                 break
 
+    def get_event_by_name(self, event_name: str) -> "Event":
+        """Returns an event by name.
+
+        Args:
+            event_name (str): The name of the event
+
+        Returns:
+            Event: The event with the name
+        """
+        for event in self.events:
+            if event.name == event_name:
+                return event
+
     # Loading and saving of pulse sequences
 
     def to_json(self):
@@ -229,14 +242,18 @@ class QuackSequence(PulseSequence):
 
         self.phase_table = PhaseTable(self)
 
-    def add_blank_event(self, event_name: str, duration: float):
+    def add_blank_event(self, event_name: str, duration: float) -> Event:
         """Adds a blank event to the pulse sequence.
 
         Args:
             event_name (str): The name of the event
             duration (float): The duration of the event with a unit suffix (n, u, m)
+
+        Returns:
+            Event: The created event
         """
-        _ = self.create_event(event_name, duration)
+        event = self.create_event(event_name, duration)
+        return event
 
     def add_pulse_event(
         self,
@@ -245,7 +262,7 @@ class QuackSequence(PulseSequence):
         amplitude: float,
         phase: float,
         shape: Function = RectFunction(),
-    ):
+    ) -> Event:
         """Adds a pulse event to the pulse sequence.
 
         Args:
@@ -254,31 +271,44 @@ class QuackSequence(PulseSequence):
             amplitude (float): The amplitude of the transmit pulse in percent (min 0, max 100)
             phase (float): The phase of the transmit pulse
             shape (Function): The shape of the transmit pulse
+
+        Returns:
+            Event: The created event
         """
         event = self.create_event(event_name, duration)
         self.set_tx_amplitude(event, amplitude)
         self.set_tx_phase(event, phase)
         self.set_tx_shape(event, shape)
 
-    def add_readout_event(self, event_name: str, duration: float):
+        return event
+
+    def add_readout_event(self, event_name: str, duration: float) -> Event:
         """Adds a readout event to the pulse sequence.
 
         Args:
             event_name (str): The name of the event
             duration (float): The duration of the event with a unit suffix (n, u, m)
+
+        Returns:
+            Event: The created event
         """
         event = self.create_event(event_name, duration)
         self.set_rx(event, True)
 
+        return event
+
     # TX Specific functions
 
-    def set_tx_amplitude(self, event, amplitude: float) -> None:
+    def set_tx_amplitude(self, event: Event | str, amplitude: float) -> None:
         """Sets the relative amplitude of the transmit pulse in percent (larger 0 - max 100).
 
         Args:
-            event (Event): The event to set the amplitude for
+            event (Event | str): The event to set the amplitude for or the name of the event
             amplitude (float): The amplitude of the transmit pulse in percent
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         if amplitude <= 0 or amplitude > 100:
             raise ValueError(
                 "Amplitude needs to be larger than 0 and smaller or equal to 100"
@@ -288,68 +318,88 @@ class QuackSequence(PulseSequence):
             TXPulse.RELATIVE_AMPLITUDE
         ).value = amplitude
 
-    def set_tx_phase(self, event, phase: float) -> None:
+    def set_tx_phase(self, event: Event | str, phase: float) -> None:
         """Sets the phase of the transmitter.
 
         Args:
-            event (Event): The event to set the phase for
+            event (Event | str): The event to set the phase for or the name of the event
             phase (float): The phase of the transmitter
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.TX_PHASE
         ).value = phase
 
-    def set_tx_shape(self, event, shape: Function) -> None:
+    def set_tx_shape(self, event: Event | str, shape: Function) -> None:
         """Sets the shape of the transmit pulse.
 
         Args:
-            event (Event): The event to set the shape for
+            event (Event | str): The event to set the shape for or the name of the event
             shape (Function): The shape of the transmit pulse
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.TX_PULSE_SHAPE
         ).value = shape
 
-    def set_tx_n_phase_cycles(self, event, n_phase_cycles: int) -> None:
+    def set_tx_n_phase_cycles(self, event: Event | str, n_phase_cycles: int) -> None:
         """Sets the number of phase cycles for the transmit pulse.
 
         Args:
-            event (Event): The event to set the number of phase cycles for
+            event (Event | str): The event to set the number of phase cycles for or the name of the event
             n_phase_cycles (int): The number of phase cycles
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.N_PHASE_CYCLES
         ).value = n_phase_cycles
 
-    def set_tx_phase_cycle_group(self, event, phase_cycle_group: int) -> None:
+    def set_tx_phase_cycle_group(
+        self, event: Event | str, phase_cycle_group: int
+    ) -> None:
         """Sets the phase cycle group for the transmit pulse.
 
         Args:
-            event (Event): The event to set the phase cycle group for
+            event (Event | str): The event to set the phase cycle group for or the name of the event
             phase_cycle_group (int): The phase cycle group
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         event.parameters[self.TX_PULSE].get_option_by_name(
             TXPulse.PHASE_CYCLE_GROUP
         ).value = phase_cycle_group
 
     # RX Specific functions
 
-    def set_rx(self, event, rx: bool) -> None:
+    def set_rx(self, event : Event | str, rx: bool) -> None:
         """Sets the receiver on or off.
 
         Args:
-            event (Event): The event to set the receiver for
+            event (Event | str): The event to set the receiver state for or the name of the event
             rx (bool): The receiver state
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx
 
-    def set_rx_readout_scheme(self, event, readout_scheme: list) -> None:
+    def set_rx_readout_scheme(self, event : Event | str, readout_scheme: list) -> None:
         """Sets the readout scheme of the receiver.
 
         Args:
-            event (Event): The event to set the readout scheme for
+            event (Event | str): The event to set the readout scheme for or the name of the event
             readout_scheme (list): The readout scheme of the receiver
         """
+        if isinstance(event, str):
+            event = self.get_event_by_name(event)
+
         # Check that the readout scheme is valid
         self.phase_table.update_phase_array()
         n_cycles = self.phase_table.n_phase_cycles
