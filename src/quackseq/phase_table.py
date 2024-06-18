@@ -74,12 +74,16 @@ class PhaseTable:
 
         # The number of rows is the maximum number of phase values in a phase group multiplied for every phase group
         n_rows = 1
+        max_phase_values = 1
         for i in range(max_phase_group + 1):
             for parameter, (group, phase_values) in phase_table.items():
-                if group == i:
-                    n_rows *= len(phase_values)
-                    break
+                if max_phase_values < len(phase_values):
+                    max_phase_values = len(phase_values)
+                
+            n_rows *= max_phase_values
+            max_phase_values = 1
 
+        # This should be four
         logger.info(f"Number of rows: {n_rows}")
 
         # Create the phase table
@@ -124,6 +128,7 @@ class PhaseTable:
             phase_length = len(list(group_phases[group].values())[0])
             group_parameters = list(group_phases[group].items())
             first_parameter = group_parameters[0][0]
+            logger.debug(f"First parameter: {first_parameter}")
 
             for i in range(phase_length):
                 for parameter, phases in group_phases[group].items():
@@ -150,7 +155,7 @@ class PhaseTable:
                         try:
                             total_group_phases[i] += [parameter, phases[i]]
                         except IndexError:
-                            logger.info(f"Index Error: Parameter {parameter}, Phases: {phases}")
+                            logger.info(f"Index Error 1: Parameter {parameter}, Phases: {phases}")
 
             return total_group_phases
 
@@ -164,8 +169,8 @@ class PhaseTable:
                 column = list(phase_table.keys()).index(parameter)
                 try:
                     phase_array[row, column] = phase_value
-                except IndexError:
-                    logger.info(f"Index error: {row}, {column}, {phase_value}")
+                except IndexError as e:
+                    logger.info(f"Index error 2: {row}, {column}, {phase_value}, {phase}, {e}")
 
         logger.info(phase_array)
 
