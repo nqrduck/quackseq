@@ -3,13 +3,15 @@
 from quackseq.pulsesequence import QuackSequence
 from quackseq.functions import RectFunction
 
+
 def create_SEPC() -> QuackSequence:
     """Creates a simple spin echo sequence with phase cycling.
+    
     The sequence consists of a pi/2 pulse, a pi pulse, and a readout event.
 
     The phase cycling is set to cycle through 0°, 90°, 180°, 270° for the first pulse and constant 180° for the second pulse.
     The readout phase for the different phase cycles is set to 0°, 90°, 180°, 270°.
-    
+
     Returns:
         QuackSequence: The SEPC sequence
     """

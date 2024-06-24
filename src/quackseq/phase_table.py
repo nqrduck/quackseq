@@ -1,3 +1,5 @@
+"""The phase table module contains the PhaseTable class, which interprets the TX parameters of a QuackSequence object and then generates a table of different phase values and signs for each phasecycle."""
+
 import logging
 import numpy as np
 from collections import OrderedDict
@@ -11,6 +13,7 @@ class PhaseTable:
     """A phase table interprets the TX parameters of a QuackSequence object and then generates a table of different phase values and signs for each phasecycle."""
 
     def __init__(self, quackseq):
+        """Initializes the phase table."""
         self.quackseq = quackseq
         self.phase_array = self.generate_phase_array()
 
@@ -21,7 +24,6 @@ class PhaseTable:
             phase_array (np.array): A table of phase values for each phasecycle.
                                     The columns are the values for the different TX pulse parameters and the rows are the different phase cycles.
         """
-
         phase_table = OrderedDict()
         events = self.quackseq.events
 
@@ -63,7 +65,9 @@ class PhaseTable:
         logger.info(phase_table)
 
         # Now get the maximum phase group
-        max_phase_group = int(max([phase_group for phase_group, _ in phase_table.values()]))
+        max_phase_group = int(
+            max([phase_group for phase_group, _ in phase_table.values()])
+        )
 
         logger.info(f"Max phase group: {max_phase_group}")
 
@@ -79,7 +83,7 @@ class PhaseTable:
             for parameter, (group, phase_values) in phase_table.items():
                 if max_phase_values < len(phase_values):
                     max_phase_values = len(phase_values)
-                
+
             n_rows *= max_phase_values
             max_phase_values = 1
 
@@ -155,7 +159,9 @@ class PhaseTable:
                         try:
                             total_group_phases[i] += [parameter, phases[i]]
                         except IndexError:
-                            logger.info(f"Index Error 1: Parameter {parameter}, Phases: {phases}")
+                            logger.info(
+                                f"Index Error 1: Parameter {parameter}, Phases: {phases}"
+                            )
 
             return total_group_phases
 
@@ -170,12 +176,14 @@ class PhaseTable:
                 try:
                     phase_array[row, column] = phase_value
                 except IndexError as e:
-                    logger.info(f"Index error 2: {row}, {column}, {phase_value}, {phase}, {e}")
+                    logger.info(
+                        f"Index error 2: {row}, {column}, {phase_value}, {phase}, {e}"
+                    )
 
         logger.info(phase_array)
 
         return phase_array
-    
+
     def update_phase_array(self):
         """Update the phase array of the sequence."""
         self.phase_array = self.generate_phase_array()
@@ -184,15 +192,17 @@ class PhaseTable:
     def phase_array(self) -> np.array:
         """The phase array of the sequence."""
         return self._phase_array
-    
+
     @phase_array.setter
-    def phase_array(self, phase_array : np.array):
+    def phase_array(self, phase_array: np.array):
         self._phase_array = phase_array
 
     @property
     def n_phase_cycles(self) -> int:
+        """The number of phase cycles in the sequence."""
         return self.phase_array.shape[0]
-    
+
     @property
     def n_parameters(self) -> int:
+        """The number of TX pulse parameters in the sequence."""
         return self.phase_array.shape[1]

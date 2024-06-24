@@ -232,9 +232,15 @@ class FunctionOption(Option):
         obj = cls(data["name"], functions)
         obj.value = Function.from_json(data["value"])
         return obj
-    
+
+
 class TableOption(Option):
-    """A table option has rows and columns and can be used to store a table of values. The value is a list of lists."""
+    """A table option has rows and columns and can be used to store a table of values.
+
+    The table option acts as a 'meta' option, which means that we can add different types of options to the table as rows. 
+    Associated with every row we can add a number of different values.
+    The number  of rows can be adjusted at runtime.
+    """
 
     def __init__(self, name: str, value) -> None:
         """Initializes the table option."""
