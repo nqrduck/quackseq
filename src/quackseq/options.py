@@ -242,13 +242,32 @@ class TableOption(Option):
     The number  of rows can be adjusted at runtime.
     """
 
-    def __init__(self, name: str, value) -> None:
+    def __init__(self, name: str, value = None) -> None:
         """Initializes the table option."""
         super().__init__(name, value)
+
+        self.options = []
+        self.n_rows = 0
 
     def set_value(self, value):
         """Sets the value of the option."""
         self.value = value
+
+    def add_option(self, option: Option) -> None:
+        """Adds an option to the table.
+
+        Args:
+            option (Option): The option to add.
+        """
+        self.options.append(option)
+
+    def set_n_rows(self, n_rows : int) -> None:
+        """Sets the number of rows in the table.
+
+        Args:
+            n_rows (int): The number of rows.
+        """
+        self.n_rows = n_rows
 
     def to_json(self):
         """Returns a json representation of the option.
@@ -274,3 +293,28 @@ class TableOption(Option):
         """
         obj = cls(data["name"], data["value"])
         return obj
+
+
+class ReadoutOption(TableOption):
+    """Readout Option for Phase Table processing.
+    
+    The Readout Option is a special TableOption that is used for the processing of phase tables (see phase_table.py).
+    The rows are the phase cycles of the sequence.
+    
+    The columns have two different types of options:
+    - NumericOption: The phase value of the phase cycle.
+    - FunctionOption: The function that is applied to the phase cycle. Usually this is just +1, -1 or 0.
+
+    """
+
+    def __init__(self) -> None:
+        """Initializes the ReadoutOption."""
+        super().__init__("Readout Option")
+
+    def set_n_phase_cycles(self, n_phase_cycles: int) -> None:
+        """Sets the number of phase cycles in the readout option.
+
+        Args:
+            n_phase_cycles (int): The number of phase cycles.
+        """
+        self.set_n_rows(n_phase_cycles)
