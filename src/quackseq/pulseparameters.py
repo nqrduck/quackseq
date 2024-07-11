@@ -15,7 +15,7 @@ from quackseq.options import (
     FunctionOption,
     NumericOption,
     Option,
-    TableOption,
+    ReadoutOption,
 )
 from quackseq.functions import (
     RectFunction,
@@ -179,8 +179,7 @@ class RXReadout(PulseParameter):
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
 
-        # Readout Scheme for phase cycling - default is a positive sign with a 0 phase
-        self.add_option(TableOption(self.READOUT_SCHEME, [[1, 0]]))
+        self.add_option(ReadoutOption(self.READOUT_SCHEME))
 
 
 class Gate(PulseParameter):

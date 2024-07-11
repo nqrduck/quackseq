@@ -15,6 +15,7 @@ class PhaseTable:
     def __init__(self, quackseq):
         """Initializes the phase table."""
         self.quackseq = quackseq
+        self.readout_scheme = ReadoutScheme(self)
         self.phase_array = self.generate_phase_array()
 
     def generate_phase_array(self):
@@ -182,6 +183,8 @@ class PhaseTable:
 
         logger.info(phase_array)
 
+        self.readout_scheme.update_readout_scheme()
+
         return phase_array
 
     def update_phase_array(self):
@@ -206,3 +209,23 @@ class PhaseTable:
     def n_parameters(self) -> int:
         """The number of TX pulse parameters in the sequence."""
         return self.phase_array.shape[1]
+    
+class ReadoutScheme():
+    """Readout Scheme for the phase table.
+
+    The rows are the phase cycles of the sequence.
+    
+    The columns have two different types of options:
+    - The phase value of the phase cycle.
+    - The function that is applied to the phase cycle. Usually this is just +1, -1 or 0.
+
+    """
+
+    def __init__(self, phase_table : PhaseTable) -> None:
+        """Initializes the ReadoutOption."""
+        self.phase_table = phase_table
+        
+
+    def update_readout_scheme(self):
+        """Update the readout scheme of the sequence."""
+        

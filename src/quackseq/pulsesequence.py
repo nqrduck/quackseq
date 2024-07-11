@@ -378,7 +378,7 @@ class QuackSequence(PulseSequence):
 
     # RX Specific functions
 
-    def set_rx(self, event : Event | str, rx: bool) -> None:
+    def set_rx(self, event: Event | str, rx: bool) -> None:
         """Sets the receiver on or off.
 
         Args:
@@ -390,7 +390,7 @@ class QuackSequence(PulseSequence):
 
         event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx
 
-    def set_rx_readout_scheme(self, event : Event | str, readout_scheme: list) -> None:
+    def set_rx_readout_scheme(self, event: Event | str, readout_scheme: list) -> None:
         """Sets the readout scheme of the receiver.
 
         Args:
