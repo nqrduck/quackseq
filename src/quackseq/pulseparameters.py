@@ -15,7 +15,6 @@ from quackseq.options import (
     FunctionOption,
     NumericOption,
     Option,
-    ReadoutOption,
 )
 from quackseq.functions import (
     RectFunction,
@@ -169,7 +168,6 @@ class RXReadout(PulseParameter):
     """
 
     RX = "Enable RX Readout"
-    READOUT_SCHEME = "Readout Scheme"
 
     def __init__(self, name) -> None:
         """Initializes the RX Readout PulseParameter.
@@ -178,8 +176,6 @@ class RXReadout(PulseParameter):
         """
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
-
-        self.add_option(ReadoutOption(self.READOUT_SCHEME))
 
 
 class Gate(PulseParameter):

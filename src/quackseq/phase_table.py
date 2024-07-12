@@ -16,7 +16,7 @@ class PhaseTable:
         """Initializes the phase table."""
         self.quackseq = quackseq
         self.readout_scheme = ReadoutScheme(self)
-        self.phase_array = self.generate_phase_array()
+        self.generate_phase_array()
 
     def generate_phase_array(self):
         """Generate a list of phases for each phasecycle in the sequence.
@@ -183,13 +183,11 @@ class PhaseTable:
 
         logger.info(phase_array)
 
+        # First set the phase array
+        self.phase_array = phase_array
+
+        # Then update the readout scheme (always reset it)
         self.readout_scheme.update_readout_scheme()
-
-        return phase_array
-
-    def update_phase_array(self):
-        """Update the phase array of the sequence."""
-        self.phase_array = self.generate_phase_array()
 
     @property
     def phase_array(self) -> np.array:
@@ -209,23 +207,58 @@ class PhaseTable:
     def n_parameters(self) -> int:
         """The number of TX pulse parameters in the sequence."""
         return self.phase_array.shape[1]
-    
-class ReadoutScheme():
+
+
+class ReadoutScheme:
     """Readout Scheme for the phase table.
 
     The rows are the phase cycles of the sequence.
-    
+
     The columns have two different types of options:
     - The phase value of the phase cycle.
     - The function that is applied to the phase cycle. Usually this is just +1, -1 or 0.
 
     """
 
-    def __init__(self, phase_table : PhaseTable) -> None:
+    def __init__(self, phase_table: PhaseTable) -> None:
         """Initializes the ReadoutOption."""
         self.phase_table = phase_table
-        
 
     def update_readout_scheme(self):
-        """Update the readout scheme of the sequence."""
-        
+        """Update the readout scheme of the sequence. Whenever the phase array is updated it will be reset."""
+
+        self.readout_scheme = np.zeros(
+            (self.phase_table.n_phase_cycles, self.phase_table.n_parameters)
+        )
+
+    def set_phase_cycle(
+        self, phase_cycle: int, phase_shift: float, function: str
+    ) -> None:
+        """Sets the phase shift and function of a phase cycle.
+
+        Args:
+            phase_cycle (int): The phase cycle.
+            phase_shift (float): The phase shift.
+            function (str): The function.
+        """
+        self.readout_scheme[phase_cycle] = [phase_shift, function]
+
+    @property
+    def readout_scheme(self) -> np.array:
+        """The readout scheme of the sequence."""
+        return self._readout_scheme
+
+    @readout_scheme.setter
+    def readout_scheme(self, readout_scheme: list) -> None:
+        """Sets the readout scheme of the sequence.
+
+        Args:
+            readout_scheme (list): The readout scheme.
+        """
+        # Sanity check
+        if len(readout_scheme) != self.phase_table.n_phase_cycles:
+            raise ValueError(
+                f"Length of readout scheme ({len(readout_scheme)}) does not match the number of phase cycles ({self.phase_table.n_phase_cycles})"
+            )
+
+        self._readout_scheme = readout_scheme

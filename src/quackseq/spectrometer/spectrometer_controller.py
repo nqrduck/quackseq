@@ -55,7 +55,8 @@ class SpectrometerController:
                         [event.duration for event in previous_events]
                     )
                     rx_duration = event.duration
-                    readout_scheme = parameter.get_option_by_name(RXReadout.READOUT_SCHEME).value
+                    # This is fugly
+                    readout_scheme = sequence.phase_table.readout_scheme.readout_scheme
 
         rx_begin = float(previous_events_duration)
         if rx_duration:

@@ -401,7 +401,7 @@ class QuackSequence(PulseSequence):
             event = self.get_event_by_name(event)
 
         # Check that the readout scheme is valid
-        self.phase_table.update_phase_array()
+        self.phase_table.generate_phase_array()
         n_cycles = self.phase_table.n_phase_cycles
 
         rows = len(readout_scheme)
@@ -411,6 +411,9 @@ class QuackSequence(PulseSequence):
                 f"Readout scheme needs to have {n_cycles} cycles, but has {rows}"
             )
 
-        event.parameters[self.RX_READOUT].get_option_by_name(
-            RXReadout.READOUT_SCHEME
-        ).value = readout_scheme
+        # Old way - implement the sequence wide readout scheme here
+        #event.parameters[self.RX_READOUT].get_option_by_name(
+        #    RXReadout.READOUT_SCHEME
+        #).value = readout_scheme
+
+        self.phase_table.readout_scheme.readout_scheme = readout_scheme
