@@ -24,7 +24,7 @@ def create_COMPFID():
     COMPFID.add_readout_event("rx", "100u")
 
     # No phase shifiting of the receive data but weighting of -1 for the 45 degree pulse, +1 for the 135 degree pulse, -1 for the 225 degree pulse and +1 for the 315 degree pulse
-    readout_scheme = [[1, 0], [-1, 0], [1, 0], [-1, 0]]
+    readout_scheme = [0, 180, 0, 180]
 
     COMPFID.set_rx_readout_scheme("rx", readout_scheme)
 
