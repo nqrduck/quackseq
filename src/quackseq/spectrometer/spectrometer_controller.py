@@ -30,7 +30,7 @@ class SpectrometerController:
         """This method translates the RX event of the pulse sequence to the limr object.
 
         Returns:
-        tuple: A tuple containing the start and stop time of the RX event in µs and the phase of the RX event.
+        tuple: A tuple containing the start and stop time of the RX event in µs and the phase of the RX event and the phase as a list of different phase values for each phasecycle.
         """
         # This is a correction factor for the RX event. The offset of the first pulse is 2.2µs longer than from the specified samples.
         events = sequence.events
@@ -55,8 +55,12 @@ class SpectrometerController:
                         [event.duration for event in previous_events]
                     )
                     rx_duration = event.duration
-                    # This is fugly
-                    readout_scheme = sequence.phase_table.readout_scheme.readout_scheme
+
+                    # We get the RX phase from the RX event
+                    readout_scheme = parameter.get_option_by_name(
+                        RXReadout.READOUT_SCHEME
+                    )
+                    readout_scheme = readout_scheme.get_value()[0]
 
         rx_begin = float(previous_events_duration)
         if rx_duration:
