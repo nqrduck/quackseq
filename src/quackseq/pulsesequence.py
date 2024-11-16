@@ -242,6 +242,12 @@ class QuackSequence(PulseSequence):
 
         self.phase_table = PhaseTable(self)
 
+    def update_options(self) -> None:
+        """Updates the options of the pulse parameters."""
+        for event in self.events:
+            for pulse_parameter in event.parameters.values():
+                pulse_parameter.update_option(self)
+
     def add_blank_event(self, event_name: str, duration: float) -> Event:
         """Adds a blank event to the pulse sequence.
 
@@ -279,6 +285,8 @@ class QuackSequence(PulseSequence):
         self.set_tx_amplitude(event, amplitude)
         self.set_tx_phase(event, phase)
         self.set_tx_shape(event, shape)
+
+        self.update_options()
 
         return event
 
@@ -360,6 +368,8 @@ class QuackSequence(PulseSequence):
             TXPulse.N_PHASE_CYCLES
         ).value = n_phase_cycles
 
+        self.update_options()
+
     def set_tx_phase_cycle_group(
         self, event: Event | str, phase_cycle_group: int
     ) -> None:
@@ -376,6 +386,8 @@ class QuackSequence(PulseSequence):
             TXPulse.PHASE_CYCLE_GROUP
         ).value = phase_cycle_group
 
+        self.update_options()
+
     # RX Specific functions
 
     def set_rx(self, event: Event | str, rx: bool) -> None:
@@ -390,30 +402,34 @@ class QuackSequence(PulseSequence):
 
         event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.RX).value = rx
 
-    def set_rx_readout_scheme(self, event: Event | str, readout_scheme: list) -> None:
-        """Sets the readout scheme of the receiver.
+    def set_rx_phase(self, event: Event | str, phase: list) -> None:
+        """Sets the phase of the receiver.
 
         Args:
-            event (Event | str): The event to set the readout scheme for or the name of the event
-            readout_scheme (list): The readout scheme of the receiver
+            event (Event | str): The event to set the phase for or the name of the event
+            phase (list): The phase of the receiver
         """
         if isinstance(event, str):
             event = self.get_event_by_name(event)
 
-        # Check that the readout scheme is valid
-        self.phase_table.generate_phase_array()
-        n_cycles = self.phase_table.n_phase_cycles
+        rx_table = event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.READOUT_SCHEME)
 
-        rows = len(readout_scheme)
+        # Get the actual option
+        phase_option = rx_table.get_option_by_name(RXReadout.PHASE)
 
-        if rows != n_cycles:
+        # Check that the number of phases is the same as the number of phase cycles
+        if len(phase) != self.get_n_phase_cycles():
             raise ValueError(
-                f"Readout scheme needs to have {n_cycles} cycles, but has {rows}"
+                f"Number of phases ({len(phase)}) needs to be the same as the number of phase cycles ({self.get_n_phase_cycles()})"
             )
 
-        # Old way - implement the sequence wide readout scheme here
-        #event.parameters[self.RX_READOUT].get_option_by_name(
-        #    RXReadout.READOUT_SCHEME
-        #).value = readout_scheme
+        # Set the values
+        phase_option.values = phase
 
-        self.phase_table.readout_scheme.readout_scheme = readout_scheme
+    def get_n_phase_cycles(self) -> int:
+        """Returns the number of phase cycles of the pulse sequence.
+
+        Returns:
+            int: The number of phase cycles
+        """
+        return self.phase_table.n_phase_cycles

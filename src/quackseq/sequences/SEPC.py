@@ -29,6 +29,6 @@ def create_SEPC() -> QuackSequence:
     # Readout scheme for phase cycling TX pulses have the scheme 0 90 180 270 
     readout_scheme = [0, 90, 180, 270]
 
-    sepc.set_rx_readout_scheme("rx", readout_scheme)
+    sepc.set_rx_phase("rx", readout_scheme)
 
     return sepc

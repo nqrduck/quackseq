@@ -6,11 +6,13 @@ Todo:
 
 from __future__ import annotations
 import logging
+from typing import override
 
 import numpy as np
 from numpy.core.multiarray import array as array
 
 from quackseq.options import (
+    TableOption,
     BooleanOption,
     FunctionOption,
     NumericOption,
@@ -80,6 +82,16 @@ class PulseParameter:
             if option.name == name:
                 return option
         raise ValueError(f"Option with name {name} not found")
+
+    def update_option(self, sequence: "QuackSequence") -> None:
+        """Generic update option method for pulse parameters.
+
+        This can be implemented by subclasses to update the options of the pulse parameter whenever the parameter is called (e.g. in the GUI).
+
+        Args:
+            sequence (QuackSequence): The sequence to update the options from.
+        """
+        pass
 
 
 class TXPulse(PulseParameter):
@@ -168,6 +180,8 @@ class RXReadout(PulseParameter):
     """
 
     RX = "Enable RX Readout"
+    READOUT_SCHEME = "Readout Scheme"
+    PHASE = "Phase"
 
     def __init__(self, name) -> None:
         """Initializes the RX Readout PulseParameter.
@@ -176,6 +190,27 @@ class RXReadout(PulseParameter):
         """
         super().__init__(name)
         self.add_option(BooleanOption(self.RX, False))
+
+        # Readout Scheme:
+        readout_option = TableOption(self.READOUT_SCHEME)
+
+        # Add Phase Option to Readout Scheme
+        phase_option = NumericOption
+
+        readout_option.add_column(self.PHASE, phase_option, 0)
+
+        # Set number of rows to default value
+        readout_option.set_n_rows(1)
+
+        self.add_option(readout_option)
+
+    @override
+    def update_option(self, sequence: "QuackSequence") -> None:
+        """Adjusts the number of rows in the table option based on the number of phase cycles in the sequence."""
+        n_phase_cycles = sequence.get_n_phase_cycles()
+        readout_option = self.get_option_by_name(self.READOUT_SCHEME)
+        readout_option.set_n_rows(n_phase_cycles)
+        logger.debug(f"Updated RX Readout option with {n_phase_cycles} rows")
 
 
 class Gate(PulseParameter):
