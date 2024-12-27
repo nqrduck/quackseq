@@ -414,9 +414,6 @@ class QuackSequence(PulseSequence):
 
         rx_table = event.parameters[self.RX_READOUT].get_option_by_name(RXReadout.READOUT_SCHEME)
 
-        # Get the actual option
-        phase_option = rx_table.get_option_by_name(RXReadout.PHASE)
-
         # Check that the number of phases is the same as the number of phase cycles
         if len(phase) != self.get_n_phase_cycles():
             raise ValueError(
@@ -424,7 +421,8 @@ class QuackSequence(PulseSequence):
             )
 
         # Set the values
-        phase_option.values = phase
+        rx_table.set_column(RXReadout.PHASE, phase)
+        
 
     def get_n_phase_cycles(self) -> int:
         """Returns the number of phase cycles of the pulse sequence.

@@ -272,6 +272,16 @@ class TableOption(Option):
         for i, column in enumerate(values):
             self.columns[i].set_row_values(column)
 
+    def set_column(self, column_name: str, values: list) -> None:
+        """Sets the values of a column in the table.
+
+        Args:
+            column_name (str): The name of the column.
+            values: The values of the column.
+        """
+        column = self.get_column_by_name(column_name)
+        column.set_row_values(values)
+
     def get_value(self) -> list:
         """Gets the value of the option.
 
@@ -292,7 +302,7 @@ class TableOption(Option):
         for column in self.columns:
             column.update_n_rows(n_rows)
 
-    def get_option_by_name(self, name: str) -> Option:
+    def get_column_by_name(self, name: str) -> Option:
         """Gets an option by its name.
 
         Args:
@@ -301,10 +311,10 @@ class TableOption(Option):
         Returns:
             Option: The option with the given name.
         """
-        for option in self.options:
-            if option.name == name:
-                return option
-        raise ValueError(f"Option with name {name} not found")
+        for column in self.columns:
+            if column.name == name:
+                return column
+        raise ValueError(f"Column with name {name} not found")
 
     def to_json(self):
         """Returns a json representation of the option.
@@ -314,7 +324,7 @@ class TableOption(Option):
         """
         return {
             "name": self.name,
-            "value": self.value,
+            "value": [column.to_json() for column in self.columns],
             "class": self.__class__.__name__,
         }
 
@@ -329,6 +339,7 @@ class TableOption(Option):
             TableOption: The TableOption.
         """
         obj = cls(data["name"], data["value"])
+        obj.columns = [cls.Column.from_json(column) for column in data["value"]]
         return obj
 
     class Column:
@@ -348,6 +359,7 @@ class TableOption(Option):
             self.default_value = default_value
 
             self.options = []
+            self.update_n_rows(n_rows)
 
         def update_n_rows(self, n_rows: int) -> None:
             """Updates the number of rows in the column.
@@ -379,3 +391,42 @@ class TableOption(Option):
                 list: The values of the options in the column.
             """
             return [option.value for option in self.options]
+        
+        def to_json(self):
+            """Returns a json representation of the column.
+
+            Returns:
+                dict: The json representation of the column.
+            """
+            return {
+                "name": self.name,
+                "values": [option.to_json() for option in self.options],
+            }
+        
+        @classmethod
+        def from_json(cls, data):
+            """Creates a Column from a json representation.
+
+            Args:
+                data (dict): The json representation of the Column.
+
+            Returns:
+                Column: The Column.
+            """
+            # This needs  to created objects  from the json representation of the options
+            logger.debug(f"Data: {data}")
+            for subclass in Option.subclasses:
+                if subclass.__name__ == data["values"][0]["class"]:
+                    type = subclass
+                    break
+
+            name = data["name"]
+            default_value = data["values"][0]["value"]
+            n_rows = len(data["values"])
+            logger.debug(f"name: {name}, type: {type}, default_value: {default_value}, n_rows: {n_rows}")
+            obj = cls(name, type, default_value, n_rows)
+
+            row_values = [option["value"] for option in data["values"]]
+            logger.debug(f"Row values: {row_values}")
+            obj.set_row_values(row_values)
+            return obj

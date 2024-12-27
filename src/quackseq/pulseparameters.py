@@ -212,6 +212,15 @@ class RXReadout(PulseParameter):
         readout_option.set_n_rows(n_phase_cycles)
         logger.debug(f"Updated RX Readout option with {n_phase_cycles} rows")
 
+    def set_phase(self, phase: list) -> None:
+        """Sets the phase of the RX Readout.
+
+        Args:
+            phase (list): The phase of the RX Readout
+        """
+        readout_option = self.get_option_by_name(self.READOUT_SCHEME)
+        readout_option.set_column(self.PHASE, phase)
+
 
 class Gate(PulseParameter):
     """Basic PulseParameter for the Gate. It includes an option for the Gate state.
