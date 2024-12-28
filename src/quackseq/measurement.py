@@ -19,7 +19,7 @@ class Measurement:
 
     Args:
         name (str): Name of the measurement.
-        tdx (np.array): Time axis for the x axis of the measurement data. This can be multi-dimensional. Axis 0 are the different data sets (e.g. phase cycles).
+        tdx (np.array): Time axis for the x axis of the measurement data.
         tdy (np.array): Time axis for the y axis of the measurement data. This can be multi-dimensional. Axis 0 are the different data sets (e.g. phase cycles).
         target_frequency (float): Target frequency of the measurement.
         frequency_shift (float, optional): Frequency shift of the measurement. Defaults to 0.
@@ -46,28 +46,26 @@ class Measurement:
     ) -> None:
         """Initializes the measurement."""
         self.name = name
-        self.tdx = [tdx]
-        self.tdy = [tdy]
+        self.tdx = tdx
+        self.tdy = tdy
         self.target_frequency = target_frequency
         self.frequency_shift = frequency_shift
         self.IF_frequency = IF_frequency
         fdx, fdy = sp.fft(tdx, tdy, frequency_shift)
-        self.fdx = [fdx]
-        self.fdy = [fdy]
+        self.fdx = fdx
+        self.fdy = fdy
         self.fits = []
 
-    def add_dataset(self, tdx: np.array, tdy: np.array) -> None:
-        """Adds dataset to the measurement.
+    def add_dataset(self, tdy: np.array) -> None:
+        """Adds dataset to the measurement. We only add the y data, as the x data is the same for all datasets.
 
         Args:
-            tdx (np.array): Time axis for the x axis of the measurement data.
             tdy (np.array): Time axis for the y axis of the measurement data.
         """
-        self.tdx.append(tdx)
-        self.tdy.append(tdy)
-        fdx, fdy = sp.fft(tdx, tdy, self.frequency_shift)
-        self.fdx.append(fdx)
-        self.fdy.append(fdy)
+        # Add the y data in the second dimension
+        self.tdy = np.concatenate((self.tdy, tdy), axis=1)
+        _, fdy = sp.fft(self.tdx, tdy, self.frequency_shift)  
+        self.fdy = np.concatenate((self.fdy, fdy), axis=1)
 
     def apodization(self, function: Function) -> "Measurement":
         """Applies apodization to the measurement data.
@@ -102,10 +100,10 @@ class Measurement:
             index (int): Index of the data set to apply the phase shift to.
             axis (int): Axis to apply the phase shift to. Defaults to 0.
         """
-        spec = fft(self.tdy[index])
+        spec = fft(self.tdy[:, index])
         shifted_signal = np.exp(1j * np.deg2rad(phase)) * spec
 
-        self.tdy[index] = ifft(shifted_signal, n=len(self.tdy[index]))
+        self.tdy[:, index] = ifft(shifted_signal, n=len(self.tdy[:, index]))
 
     def add_fit(self, fit: "Fit") -> None:
         """Adds a fit to the measurement.
