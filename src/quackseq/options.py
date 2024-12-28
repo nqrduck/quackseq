@@ -381,6 +381,7 @@ class TableOption(Option):
             Args:
                 values: The values of the options in the column.
             """
+            self.update_n_rows(len(values))
             for i, value in enumerate(values):
                 self.options[i].set_value(value)
 
