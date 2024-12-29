@@ -204,6 +204,7 @@ class BooleanSetting(Setting):
     @value.setter
     def value(self, value):
         try:
+            logger.debug(f"Setting {self.name} to {value}")
             self._value = bool(value)
         except ValueError:
             raise ValueError("Value must be a bool")
@@ -224,12 +225,12 @@ class SelectionSetting(Setting):
         self, name: str, category: str, options: list, default: str, description: str
     ) -> None:
         """Create a new selection setting."""
-        super().__init__(name, category, description, default)
-        # Check if default is in options
         if default not in options:
             raise ValueError("Default value must be one of the options")
 
         self.options = options
+
+        super().__init__(name, category, description, default)
 
     @property
     def value(self):
@@ -238,15 +239,12 @@ class SelectionSetting(Setting):
 
     @value.setter
     def value(self, value):
-        try:
-            if value in self.options:
-                self._value = value
-            else:
-                raise ValueError(f"Value must be one of the options {self.options}")
-        # This fixes a bug when creating the widget when the options are not yet set
-        except AttributeError:
+
+        if value in self.options:
+            logger.debug(f"Setting {self.name} to {value}")
             self._value = value
-            self.options = [value]
+        else:
+            raise ValueError(f"Value must be one of the options {self.options}")
 
 
 class StringSetting(Setting):
@@ -273,6 +271,7 @@ class StringSetting(Setting):
     @value.setter
     def value(self, value):
         try:
+            logger.debug(f"Setting {self.name} to {value}")
             self._value = str(value)
         except ValueError:
             raise ValueError("Value must be a string")
