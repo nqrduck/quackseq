@@ -64,7 +64,7 @@ class Measurement:
         """
         # Add the y data in the second dimension
         self.tdy = np.concatenate((self.tdy, tdy), axis=1)
-        _, fdy = sp.fft(self.tdx, tdy, self.frequency_shift)  
+        _, fdy = sp.fft(self.tdx, tdy, self.frequency_shift)
         self.fdy = np.concatenate((self.fdy, fdy), axis=1)
 
     def apodization(self, function: Function) -> "Measurement":
@@ -140,7 +140,7 @@ class Measurement:
         return {
             "name": self.name,
             "tdx": self.tdx.tolist(),
-            "tdy": [[x.real, x.imag] for x in self.tdy],
+            "tdy": self.serialize_complex_array(self.tdy),
             "target_frequency": self.target_frequency,
             "IF_frequency": self.IF_frequency,
             "fits": [fit.to_json() for fit in self.fits],
@@ -156,7 +156,8 @@ class Measurement:
         Returns:
             Measurement: The measurement.
         """
-        tdy = np.array([complex(y[0], y[1]) for y in json["tdy"]])
+        tdy = np.array(json["tdy"][0]) + 1j * np.array(json["tdy"][1])
+
         measurement = cls(
             json["name"],
             np.array(json["tdx"]),
@@ -169,6 +170,17 @@ class Measurement:
             measurement.add_fit(Fit.from_json(fit_json, measurement))
 
         return measurement
+    
+    def serialize_complex_array(self, array: np.array) -> list:
+        """Serializes a complex array to a list.
+
+        Args:
+            array (np.array): The complex array.
+
+        Returns:
+            list: The serialized complex array.
+        """
+        return [array.real.tolist(), array.imag.tolist()]
 
     # Properties for encapsulation
     @property
