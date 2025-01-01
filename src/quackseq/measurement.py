@@ -51,9 +51,13 @@ class Measurement:
         self.target_frequency = target_frequency
         self.frequency_shift = frequency_shift
         self.IF_frequency = IF_frequency
-        fdx, fdy = sp.fft(tdx, tdy, frequency_shift)
-        self.fdx = fdx
-        self.fdy = fdy
+        if tdx and tdy:
+            fdx, fdy = sp.fft(tdx, tdy, frequency_shift)
+            self.fdx = fdx
+            self.fdy = fdy
+        else:
+            self.fdx = None
+            self.fdy = None
         self.fits = []
 
     def add_dataset(self, tdy: np.array) -> None:
