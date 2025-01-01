@@ -174,7 +174,7 @@ class Measurement:
             measurement.add_fit(Fit.from_json(fit_json, measurement))
 
         return measurement
-    
+
     def serialize_complex_array(self, array: np.array) -> list:
         """Serializes a complex array to a list.
 
@@ -249,6 +249,15 @@ class Measurement:
     @fits.setter
     def fits(self, value: list) -> None:
         self._fits = value
+
+
+class MeasurementError(Measurement):
+    """This will be returned if the measurement is not valid."""
+
+    def __init__(self, name: str, error_meassage: str):
+        """Initializes the error message."""
+        super().__init__(name, None, None, 0)
+        self.error_message = error_meassage
 
 
 class Fit:
