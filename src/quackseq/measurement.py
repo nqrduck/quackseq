@@ -294,10 +294,11 @@ class Fit:
         """Fits the measurement data and sets the fit parameters and covariance."""
         if self.domain == "time":
             x = self.measurement.tdx
-            y = self.measurement.tdy
+            # For multi-dimensional data, we take the last data set
+            y = self.measurement.tdy[:, -1]
         elif self.domain == "frequency":
             x = self.measurement.fdx
-            y = self.measurement.fdy
+            y = self.measurement.fdy[:, -1]
         else:
             raise ValueError("Domain not recognized.")
 
