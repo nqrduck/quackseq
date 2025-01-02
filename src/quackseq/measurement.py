@@ -47,6 +47,9 @@ class Measurement:
         """Initializes the measurement."""
         self.name = name
         self.tdx = tdx
+        #If tdy has no empty second dimension, add one
+        if len(tdy.shape) == 1:
+            tdy = np.expand_dims(tdy, axis=1)
         self.tdy = tdy
         self.target_frequency = target_frequency
         self.frequency_shift = frequency_shift
@@ -86,15 +89,21 @@ class Measurement:
         logger.debug("Resolution: %s", resolution)
 
         y_weight = function.get_pulse_amplitude(duration, resolution)
-        tdy_apodized = self.tdy * y_weight
 
         apodized_measurement = Measurement(
             self.name,
             self.tdx,
-            tdy_apodized,
+            self.tdy[:, 0] * y_weight,
             target_frequency=self.target_frequency,
             IF_frequency=self.IF_frequency,
         )
+
+        # Apply the apodization function to the y data skip the first column
+        for i in range(1, self.tdy.shape[1]):
+            apodized_measurement.add_dataset(self.tdy[:, i] * y_weight)
+
+        logger.debug(f"Shape of tdy after apodization: {apodized_measurement.tdy.shape}")
+
         return apodized_measurement
 
     def phase_shift(self, phase: float, index: int, axis=0) -> np.array:
