@@ -18,5 +18,5 @@ pip install quackseq
 
 ## Modules
 
-- [quackseq-simulator](https://github.com/nqrduck/quackseq-simulator): A simulator for QuackSeq sequences.
-- [quackseq-limenqr](https://github.com/nqrduck/quackseq-limenqr): A QuackSeq interpreter for the LimeNQR spectrometer.
+- [quackseq-simulator](https://git.private.coffee/nqrduck/quackseq-simulator): A simulator for QuackSeq sequences.
+- [quackseq-limenqr](https://git.private.coffee/nqrduck/quackseq-limenqr): A QuackSeq interpreter for the LimeNQR spectrometer.
